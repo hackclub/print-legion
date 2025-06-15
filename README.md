@@ -1,6 +1,6 @@
-# Printing legion, redux
+# Printing legion
 
-new printlegion. a little simpler this time
+New printing legion setup.
 
-Built with astro. Add your site by creating a new folder under "pages".
+Fill out forms.hackclub.com/print-legion-signup to sign up!
 
