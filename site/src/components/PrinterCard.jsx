@@ -26,7 +26,7 @@ export default function PrinterCard({ printer }) {
                     <div className="flex space-x-2 mb-4">
                         <div className="bg-green-200 text-green-800 outline-2 rounded-xl px-3 py-1 outline-green-800">
                             <a
-                                href={`slack://user?team=T0266FRGM&id=${slack_id}`}
+                                href={`https://slack.com/app_redirect?channel=${slack_id}`}
                             >
                                 Message on Slack!
                             </a>
