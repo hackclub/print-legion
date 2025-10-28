@@ -35,12 +35,11 @@ If you’re not from one of these countries, we’ll send you a $20-25 HCB Card 
 export default function Landing() {
     return (
         <>
-            <Navbar />
             <div className="flex flex-col items-center justify-center">
 
                 <section className="p-8 flex flex-col items-center justify-center w-full my-8 gap-4">
-                    <h1 className="text-6xl font-[silkscreen]">Print Legion</h1>
-                    <div className="flex flex-col items-center">
+                    <h1 className="text-6xl text-center font-[silkscreen]">Print Legion</h1>
+                    <div className="text-center flex flex-col items-center">
                         <p className="text-md text-gray-400">
                             Welcome to the printing legion!
                         </p>
@@ -57,6 +56,7 @@ export default function Landing() {
                             <a href="#details">Know more</a>
                         </Button>
                     </div>
+
                 </section>
 
                 <section className="p-8 flex flex-col items-center justify-center w-full my-8 gap-4" id="details">
@@ -83,7 +83,6 @@ export default function Landing() {
 
 
             </div>
-        <Footer/>
         </>
     );
 }

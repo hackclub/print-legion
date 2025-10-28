@@ -10,22 +10,28 @@ import {
     createBrowserRouter,
     RouterProvider,
 } from "react-router-dom";
+import Layout from './components/layout.js';
 
 
 
 // actual routing
 const router = createBrowserRouter([
     {
-        path: "/",
-        element: <Landing />,
-    },
-    {
-        path: "/printers",
-        element: <PrintersPage />,
-    },
-    {
-        path: "/test",
-        element: <div>TEST ROUTE</div>
+        element: <Layout />,
+        children: [
+            {
+                path: "/",
+                element: <Landing />,
+            },
+            {
+                path: "/printers",
+                element: <PrintersPage />,
+            },
+            {
+                path: "/test",
+                element: <div>TEST ROUTE</div>
+            }
+        ]
     }
 ]);
 

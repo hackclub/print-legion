@@ -17,7 +17,7 @@ export default function Navbar() {
     ]
 
     return (
-        <nav className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
+        <nav className="shadow-lg border-b bg-background/70 backdrop-blur-md sticky top-0 z-50">
             <div className="mx-auto flex items-center justify-center p-4">
 
                 <div className="ml-auto">  {/* this div only exists to keep that those links in the middle, don't remove pls'*/}
@@ -38,7 +38,6 @@ export default function Navbar() {
                 </div>
 
                 <div className="md:hidden flex items-center gap-2">
-                    <ModeToggle />
                     <Button
                         variant="ghost"
                         size="icon"
