@@ -14,7 +14,6 @@ export default function Navbar() {
         { path: "/", label: "Home" },
         { path: "/printers", label: "Printers" },
         { path: "/#details", label: "Details" },
-        { path: "/#faq", label: "FAQ" },
     ]
 
     return (

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import ReactMarkdown from 'react-markdown';
+import Footer from "@/components/ui/footer";
 
 const markdownContent = `
 ### **For requesters**
@@ -49,17 +50,18 @@ export default function Landing() {
                     </div>
                     <div className="flex gap-2">
                         <Button variant="outline" size="lg">
-                            <Link to="/printers">Checkout the printers!!!</Link>
+                            <Link to="/printers">Checkout the printers!</Link>
                         </Button>
 
                         <Button variant="outline" size="lg">
-                            <Link to="/#details">Know More</Link>
+                            <a href="#details">Know more</a>
                         </Button>
                     </div>
                 </section>
 
-                <section className="p-8 flex flex-col items-center justify-center w-full my-8 gap-4">
-                    <div className="mb-6 rounded-lg bg-neutral-900 border border-neutral-700 p-8">
+                <section className="p-8 flex flex-col items-center justify-center w-full my-8 gap-4" id="details">
+                    <div className="shadow-xl mb-6 rounded-lg dark:bg-neutral-900 border border-neutral-700 p-8">
+                        <h1 className="text-4xl font-[silkscreen] underline mb-4" >Details</h1>
                         <ReactMarkdown
                             components={{
                                 h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mb-4 mt-2" {...props} />,
@@ -79,7 +81,9 @@ export default function Landing() {
                     </div>
                 </section>
 
+
             </div>
+        <Footer/>
         </>
     );
 }
