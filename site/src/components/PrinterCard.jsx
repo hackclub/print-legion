@@ -1,6 +1,10 @@
 export default function PrinterCard({ printer }) {
     const { slack_id, nickname, profile_pic, website, bio, country } = printer;
 
+    if (!website.startsWith("http:") && !website.startsWith("https:")) {
+        website = "http://" + website //most websites automatically puts us on https if available so this is fine
+    }
+
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
             {/* Profile Image */}
