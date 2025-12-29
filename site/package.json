@@ -12,14 +12,17 @@
   "dependencies": {
     "@mdx-js/react": "^3.1.1",
     "@tailwindcss/vite": "^4.1.10",
+    "dotenv": "^17.2.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router": "^7.6.2",
+    "rehype-external-links": "^3.0.0",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@mdx-js/rollup": "^3.1.1",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",
