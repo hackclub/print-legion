@@ -2,6 +2,7 @@ const express = require("express");
 const Airtable = require("airtable");
 const dotenv = require("dotenv");
 const path = require("path");
+const cors = require("cors");
 dotenv.config();
 
 const app = express();
@@ -10,6 +11,58 @@ const port = 3000;
 const base = new Airtable({ apiKey: process.env.AIRTABLE_KEY }).base(
     process.env.AIRTABLE_BASE_ID
 );
+
+app.use(cors());
+
+app.get("/api/stats/alltime", async (req, res) => {
+    let total_weight = 0;
+    let total_prints = 0;
+    // fetch all time prints
+    try {
+        const records = await base(process.env.AIRTABLE_PRINT_TABLE_ID)
+            .select({
+                fields: ["weight_grams"], // Your actual field names
+            })
+            .all();
+        records.forEach((record) => {
+            total_prints++;
+            total_weight += record.get("weight_grams") || 0;
+        });
+        total_spools_reimbursed = total_weight / 750; // spools are reimbursed every 750g
+        res.json({ total_prints, total_weight, total_spools_reimbursed });
+    } catch (error) {
+        console.error("Error fetching all-time stats:", error);
+        res.status(500).json({ error: "Failed to fetch all-time stats" });
+    }
+});
+
+app.get("/api/stats/leaderboard", async (req, res) => {
+    let leaderboard_position = 1;
+    try {
+        const records = await base(process.env.AIRTABLE_TABLE_ID)
+            .select({
+                fields: [
+                    "slack_id",
+                    "Display Name",
+                    "total_grams",
+                    "Profile Picture",
+                ],
+                view: "Leaderboard",
+            })
+            .all();
+        const leaderboard = records.map((record) => ({
+            position: leaderboard_position++,
+            slack_id: record.get("slack_id"),
+            nickname: record.get("Display Name"),
+            total_grams: record.get("total_grams") || 0,
+            profile_pic: record.get("Profile Picture")[0]?.url,
+        }));
+        res.json(leaderboard);
+    } catch (error) {
+        console.error("Error fetching leaderboard stats:", error);
+        res.status(500).json({ error: "Failed to fetch leaderboard stats" });
+    }
+});
 
 app.get("/api/printers", async (req, res) => {
     try {
@@ -42,11 +95,11 @@ app.get("/api/printers", async (req, res) => {
 
 // Serve the frontend from the site/dist directory
 app.use(express.static(path.resolve(__dirname, "../site/dist")));
-app.get('/{*any}', (req, res, next) => {
+app.get("/{*any}", (req, res, next) => {
     // Only serve index.html for non-API, non-static requests
-    if (req.path.startsWith('/api/')) return next();
+    if (req.path.startsWith("/api/")) return next();
     // Prevent directory traversal attacks
-    if (req.path.includes('..')) return res.status(400).send('Bad Request');
+    if (req.path.includes("..")) return res.status(400).send("Bad Request");
     res.sendFile(path.resolve(__dirname, "../site/dist", "index.html"));
 });
 
