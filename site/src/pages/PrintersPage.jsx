@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PrinterCard from "../components/PrinterCard"; // Adjust import path
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "/api/";
 
 export default function PrintersPage() {
     const [printers, setPrinters] = useState([]);

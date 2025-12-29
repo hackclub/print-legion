@@ -2,7 +2,7 @@ import LandingContent from "../markdown/LandingContent.mdx";
 import Faq from "../markdown/Faq.mdx";
 import { useState, useEffect } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || "/api/";
 
 export default function Landing() {
     const [stats, setStats] = useState([]);
