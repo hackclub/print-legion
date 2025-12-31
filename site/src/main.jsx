@@ -8,6 +8,7 @@ import './index.css'
 
 import PrintersPage from './pages/PrintersPage.jsx';
 import Landing from './pages/Landing.jsx';
+import Leaderboard from './pages/Leaderboard.jsx';
 
 // actual routing
 const router = createBrowserRouter([
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/printers",
     element: <PrintersPage />,
+  },
+  {
+    path: "/leaderboard",
+    element: <Leaderboard />,
   },
   {
     path: "/test",
