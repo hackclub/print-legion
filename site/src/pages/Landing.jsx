@@ -74,12 +74,18 @@ export default function Landing() {
                 </div>
             </div>
 
-            <div className="my-6 justify-center flex">
+            <div className="my-6 justify-center flex flex-wrap gap-4">
                 <a
                     href="/printers"
                     className="outline-1 py-2 px-6 rounded-xl text-lg font-bold bg-blue-500 text-white"
                 >
                     Check out the printers!
+                </a>
+                <a
+                    href="/leaderboard"
+                    className="outline-1 py-2 px-6 rounded-xl text-lg font-bold border border-blue-500 text-blue-600"
+                >
+                    View the leaderboard
                 </a>
             </div>
         </div>
