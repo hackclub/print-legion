@@ -179,7 +179,11 @@ app.get("/api/printers/ratings", async (req, res) => {
 
 app.post("/api/printers/:slackId/rate", async (req, res) => {
     const { slackId } = req.params;
-    const { rating, rater_slack_id: raterSlackId } = req.body || {};
+    const {
+        rating,
+        rater_slack_id: raterSlackId,
+        printing_legion_message_url: messageUrl,
+    } = req.body || {};
     const numericRating = Number(rating);
 
     if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
@@ -190,6 +194,16 @@ app.post("/api/printers/:slackId/rate", async (req, res) => {
 
     if (!raterSlackId || typeof raterSlackId !== "string") {
         return res.status(400).json({ error: "Please include your Slack ID." });
+    }
+
+    if (!messageUrl || typeof messageUrl !== "string") {
+        return res
+            .status(400)
+            .json({ error: "Please include the #printing-legion message link." });
+    }
+
+    if (!messageUrl.startsWith("http")) {
+        return res.status(400).json({ error: "Message link must be a valid URL." });
     }
 
     if (!ratingsTable) {
@@ -209,10 +223,12 @@ app.post("/api/printers/:slackId/rate", async (req, res) => {
                     slack_id: slackId,
                     rating: numericRating,
                     rater_slack_id: raterSlackId,
+                    printing_legion_message_url: messageUrl,
                 },
             },
         ]);
 
+        
         const summary = await fetchRatingsSummary(slackId);
         res.json({ slack_id: slackId, summary: summary[slackId] || { average: 0, count: 0 } });
     } catch (error) {

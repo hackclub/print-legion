@@ -16,6 +16,7 @@ export default function PrintersPage() {
     const [raterSlackId, setRaterSlackId] = useState("");
     const [modalState, setModalState] = useState({ open: false, printer: null, rating: 0 });
     const [modalSlackInput, setModalSlackInput] = useState("");
+    const [modalMessageUrl, setModalMessageUrl] = useState("");
     const [modalMessage, setModalMessage] = useState(null);
     const [modalSubmitting, setModalSubmitting] = useState(false);
 
@@ -100,14 +101,24 @@ export default function PrintersPage() {
         }
     };
 
-    const submitRating = async (slackId, nickname, rating, slackIdentifier) => {
+    const submitRating = async (
+        slackId,
+        nickname,
+        rating,
+        slackIdentifier,
+        messageUrl
+    ) => {
         try {
             const response = await fetch(`${API_URL}printers/${slackId}/rate`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ rating, rater_slack_id: slackIdentifier }),
+                body: JSON.stringify({
+                    rating,
+                    rater_slack_id: slackIdentifier,
+                    printing_legion_message_url: messageUrl,
+                }),
             });
 
             if (!response.ok) {
@@ -145,12 +156,14 @@ export default function PrintersPage() {
         setModalState({ open: true, printer, rating });
         setModalMessage(null);
         setModalSlackInput(raterSlackId || "");
+        setModalMessageUrl("");
     };
 
     const closeRatingModal = () => {
         setModalState({ open: false, printer: null, rating: 0 });
         setModalMessage(null);
         setModalSubmitting(false);
+        setModalMessageUrl("");
     };
 
     const handleModalSubmit = async () => {
@@ -161,13 +174,30 @@ export default function PrintersPage() {
             return;
         }
 
+        const trimmedUrl = modalMessageUrl.trim();
+        if (!trimmedUrl) {
+            setModalMessage({
+                type: "error",
+                text: "Drop the #printing-legion message link for this rating.",
+            });
+            return;
+        }
+        if (!trimmedUrl.startsWith("http")) {
+            setModalMessage({
+                type: "error",
+                text: "Message link must start with http or https.",
+            });
+            return;
+        }
+
         setModalSubmitting(true);
         try {
             await submitRating(
                 modalState.printer.slack_id,
                 modalState.printer.nickname,
                 modalState.rating,
-                trimmedSlack
+                trimmedSlack,
+                trimmedUrl
             );
             persistRaterSlackId(trimmedSlack);
             closeRatingModal();
@@ -298,6 +328,18 @@ export default function PrintersPage() {
                         placeholder="U01234567"
                         value={modalSlackInput}
                         onChange={(event) => setModalSlackInput(event.target.value)}
+                        disabled={modalSubmitting}
+                    />
+                    <label className="block text-sm font-semibold mt-5 mb-2" htmlFor="modal-message-url">
+                        #printing-legion message link
+                    </label>
+                    <input
+                        id="modal-message-url"
+                        type="url"
+                        className="w-full rounded-xl border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder="https://hackclub.slack.com/archives/..."
+                        value={modalMessageUrl}
+                        onChange={(event) => setModalMessageUrl(event.target.value)}
                         disabled={modalSubmitting}
                     />
                     {modalMessage && (
