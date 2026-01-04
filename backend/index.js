@@ -7,12 +7,82 @@ dotenv.config();
 
 const app = express();
 const port = 3000;
-// 1. Configure Airtable
+if (!process.env.AIRTABLE_KEY || !process.env.AIRTABLE_BASE_ID) {
+    throw new Error("Both AIRTABLE_KEY and AIRTABLE_BASE_ID must be defined.");
+}
+
 const base = new Airtable({ apiKey: process.env.AIRTABLE_KEY }).base(
     process.env.AIRTABLE_BASE_ID
 );
 
 app.use(cors());
+app.use(express.json());
+
+const ratingsTableId = process.env.AIRTABLE_RATINGS_TABLE_ID;
+const ratingsTable = ratingsTableId ? base(ratingsTableId) : null;
+
+const escapeFormulaValue = (value) => (value || "").replace(/'/g, "\\'");
+
+const aggregateSummaries = (records) =>
+    records.reduce((acc, record) => {
+        const slackId = record.get("slack_id");
+        const ratingValue = Number(record.get("rating"));
+        if (!slackId || !Number.isFinite(ratingValue)) return acc;
+
+        if (!acc[slackId]) {
+            acc[slackId] = { sum: 0, count: 0 };
+        }
+
+        acc[slackId].sum += ratingValue;
+        acc[slackId].count += 1;
+        return acc;
+    }, {});
+
+const summarizeAggregates = (aggregateMap) => {
+    const summary = {};
+    Object.entries(aggregateMap).forEach(([slackId, stats]) => {
+        const count = stats.count || 0;
+        summary[slackId] = {
+            average: count ? stats.sum / count : 0,
+            count,
+        };
+    });
+    return summary;
+};
+
+const hasRecentAirtableRating = async (slackId, raterSlackId) => {
+    if (!ratingsTable) return false;
+    const filterByFormula = `AND({slack_id}='${escapeFormulaValue(
+        slackId
+    )}', {rater_slack_id}='${escapeFormulaValue(
+        raterSlackId
+    )}', IS_AFTER(CREATED_TIME(), DATEADD(NOW(), -1, 'day'))) `;
+
+    const records = await ratingsTable
+        .select({
+            fields: ["slack_id"],
+            filterByFormula,
+            maxRecords: 1,
+        })
+        .all();
+    return records.length > 0;
+};
+
+async function fetchRatingsSummary(targetSlackId) {
+    if (!ratingsTable) return {};
+
+    const selectConfig = {
+        fields: ["slack_id", "rating"],
+    };
+
+    if (targetSlackId) {
+        selectConfig.filterByFormula = `({slack_id} = '${escapeFormulaValue(targetSlackId)}')`;
+    }
+
+    const records = await ratingsTable.select(selectConfig).all();
+    const aggregate = aggregateSummaries(records);
+    return summarizeAggregates(aggregate);
+}
 
 app.get("/api/stats/alltime", async (req, res) => {
     let total_weight = 0;
@@ -90,6 +160,64 @@ app.get("/api/printers", async (req, res) => {
     } catch (error) {
         console.error("Error fetching printers:", error);
         res.status(500).json({ error: "Failed to fetch printers" });
+    }
+});
+
+app.get("/api/printers/ratings", async (req, res) => {
+    if (!ratingsTable) {
+        return res.status(500).json({ error: "Ratings table is not configured." });
+    }
+
+    try {
+        const summary = await fetchRatingsSummary();
+        res.json(summary);
+    } catch (error) {
+        console.error("Error loading ratings:", error);
+        res.status(500).json({ error: "Failed to load ratings" });
+    }
+});
+
+app.post("/api/printers/:slackId/rate", async (req, res) => {
+    const { slackId } = req.params;
+    const { rating, rater_slack_id: raterSlackId } = req.body || {};
+    const numericRating = Number(rating);
+
+    if (!Number.isFinite(numericRating) || numericRating < 1 || numericRating > 5) {
+        return res
+            .status(400)
+            .json({ error: "Rating must be a number between 1 and 5." });
+    }
+
+    if (!raterSlackId || typeof raterSlackId !== "string") {
+        return res.status(400).json({ error: "Please include your Slack ID." });
+    }
+
+    if (!ratingsTable) {
+        return res.status(500).json({ error: "Ratings table is not configured." });
+    }
+
+    try {
+        if (await hasRecentAirtableRating(slackId, raterSlackId.trim())) {
+            return res
+                .status(429)
+                .json({ error: "You already rated this printer in the last 24 hours." });
+        }
+
+        await ratingsTable.create([
+            {
+                fields: {
+                    slack_id: slackId,
+                    rating: numericRating,
+                    rater_slack_id: raterSlackId,
+                },
+            },
+        ]);
+
+        const summary = await fetchRatingsSummary(slackId);
+        res.json({ slack_id: slackId, summary: summary[slackId] || { average: 0, count: 0 } });
+    } catch (error) {
+        console.error("Error saving rating:", error);
+        res.status(500).json({ error: "Failed to save rating" });
     }
 });
 
