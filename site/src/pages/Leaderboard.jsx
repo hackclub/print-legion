@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 const baseApiUrl = (import.meta.env.VITE_API_URL || "/api/").replace(/\/?$/, "/");
 const LEADERBOARD_URL =
 	import.meta.env.VITE_LEADERBOARD_URL ||
-	`${baseApiUrl}stats/leaderboard`// || 
-    // "https://printlegion.hackclub.com/api/stats/leaderboard";
+	// `${baseApiUrl}stats/leaderboard`// || 
+    "https://printlegion.hackclub.com/api/stats/leaderboard";
 
 export default function Leaderboard() {
 	const [entries, setEntries] = useState([]);

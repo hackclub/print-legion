@@ -1,5 +1,9 @@
-export default function PrinterCard({ printer }) {
+import RatingStars from "./RatingStars";
+
+export default function PrinterCard({ printer, ratingSummary = {}, onSelectRating }) {
     const { slack_id, nickname, profile_pic, website, bio, country } = printer;
+    const { average = 0, count = 0, userRating = 0 } = ratingSummary;
+    const displayValue = userRating || Math.round(average);
 
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
@@ -42,6 +46,25 @@ export default function PrinterCard({ printer }) {
                                 website!!
                             </a>
                         )}
+                    </div>
+                    <div className="mt-4">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                            <span className="text-lg font-semibold">
+                                {count ? average.toFixed(1) : "Unrated"}
+                            </span>
+                            {count > 0 && (
+                                <span className="text-sm text-gray-500">
+                                    ({count} rating{count > 1 ? "s" : ""})
+                                </span>
+                            )}
+                        </div>
+                        <RatingStars
+                            currentValue={displayValue}
+                            onSelect={(value) => onSelectRating?.(printer, value)}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                            Tap a star to rate this printer.
+                        </p>
                     </div>
                 </div>
             </div>
