@@ -1,17 +1,23 @@
 import SlackIcon from "./SlackIcon.jsx";
 
 export default function PrinterCard({ printer }) {
+
+
   const {
     slack_id,
     nickname,
     profile_pic,
-    website,
+
     bio,
     country,
     total_prints,
     total_grams,
   } = printer;
 
+      if (!website.startsWith("http:") && !website.startsWith("https:")) {
+        website = "http://" + website //most websites automatically puts us on https if available so this is fine
+    }
+  
   const formatWeight = (grams) => {
     if (grams == null) return "0 g";
     if (grams >= 1000) return `${(grams / 1000).toFixed(2)} kg`;
