@@ -1,13 +1,12 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router";
-import './index.css'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import "./index.css";
 
-import PrintersPage from './pages/PrintersPage.jsx';
-import Landing from './pages/Landing.jsx';
+import PrintersPage from "./pages/PrintersPage.jsx";
+import Landing from "./pages/Landing.jsx";
+import Leaderboard from "./pages/Leaderboard.jsx";
+import Footer from "./components/Footer.jsx";
 
 // actual routing
 const router = createBrowserRouter([
@@ -20,14 +19,15 @@ const router = createBrowserRouter([
     element: <PrintersPage />,
   },
   {
-    path: "/test",
-    element: <div>TEST ROUTE</div>
-  }
+    path: "/leaderboard",
+    element: <Leaderboard />,
+  },
 ]);
 
 // dom setup
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <RouterProvider router={router} />
-  </StrictMode>,
-)
+    <Footer />
+  </StrictMode>
+);
