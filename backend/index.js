@@ -29,11 +29,6 @@ function setCache(key, data) {
     cache[key] = { data, timestamp: Date.now() };
 }
 
-function getProfilePicUrl(slackId) {
-    if (!slackId) return null;
-    return `https://cachet.dunkirk.sh/users/${slackId}/r`;
-}
-
 app.get("/api/stats/alltime", async (req, res) => {
     const cached = getCached("alltime");
     if (cached) return res.json(cached);
@@ -95,22 +90,20 @@ app.get("/api/stats/leaderboard", async (req, res) => {
                     "slack_id",
                     "Display Name",
                     "total_grams",
+                    "Profile Picture",
                     "total_prints",
                 ],
                 view: "Leaderboard",
             })
             .all();
-        const leaderboard = records.map((record) => {
-            const slack_id = record.get("slack_id");
-            return {
-                position: leaderboard_position++,
-                slack_id,
-                nickname: record.get("Display Name"),
-                total_grams: record.get("total_grams") || 0,
-                total_prints: record.get("total_prints") || 0,
-                profile_pic: getProfilePicUrl(slack_id),
-            };
-        });
+        const leaderboard = records.map((record) => ({
+            position: leaderboard_position++,
+            slack_id: record.get("slack_id"),
+            nickname: record.get("Display Name"),
+            total_grams: record.get("total_grams") || 0,
+            total_prints: record.get("total_prints") || 0,
+            profile_pic: record.get("Profile Picture")[0]?.url,
+        }));
         setCache("leaderboard", leaderboard);
         res.json(leaderboard);
     } catch (error) {
@@ -129,6 +122,7 @@ app.get("/api/printers", async (req, res) => {
                 fields: [
                     "slack_id",
                     "Display Name",
+                    "Profile Picture",
                     "website",
                     "Bio",
                     "Country",
@@ -138,19 +132,16 @@ app.get("/api/printers", async (req, res) => {
                 view: "Leaderboard_inclusive",
             })
             .all();
-        const printers = records.map((record) => {
-            const slack_id = record.get("slack_id");
-            return {
-                slack_id,
-                nickname: record.get("Display Name"),
-                profile_pic: getProfilePicUrl(slack_id),
-                website: record.get("website"),
-                bio: record.get("Bio"),
-                country: record.get("Country"),
-                total_prints: record.get("total_prints") || 0,
-                total_grams: record.get("total_grams") || 0,
-            };
-        });
+        const printers = records.map((record) => ({
+            slack_id: record.get("slack_id"),
+            nickname: record.get("Display Name"),
+            profile_pic: record.get("Profile Picture")[0]?.url, // First attachment URL
+            website: record.get("website"),
+            bio: record.get("Bio"),
+            country: record.get("Country"),
+            total_prints: record.get("total_prints") || 0,
+            total_grams: record.get("total_grams") || 0,
+        }));
         setCache("printers", printers);
         res.json(printers);
     } catch (error) {
