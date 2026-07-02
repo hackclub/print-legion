@@ -21,13 +21,13 @@
   }
 }
 /* skeleton loader*/
-.skeleton-card{
+.skeleton-card {
   display: flex;
   align-items: center;
   gap: 1rem;
   border-radius: 12px;
 }
-.skeleton-avatar{
+.skeleton-avatar {
   width: 64px;
   height: 64px;
   border-radius: 9999px;
@@ -36,41 +36,41 @@
 }
 
 .skeleton-content {
-    flex: 1;
+  flex: 1;
 }
 
 .skeleton-line {
-    height: 12px;
-    background: #e5e7eb;
-    border-radius: 999px;
-    margin: 10px 0;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  margin: 10px 0;
 }
 
 .skeleton-line.short {
-    width: 40%;
+  width: 40%;
 }
 
 .skeleton-line.medium {
-    width: 70%;
+  width: 70%;
 }
 
 @keyframes skeletonPulse {
-    0% {
-        opacity: .55;
-    }
+  0% {
+    opacity: 0.55;
+  }
 
-    50% {
-        opacity: 1;
-    }
+  50% {
+    opacity: 1;
+  }
 
-    100% {
-        opacity: .55;
-    }
+  100% {
+    opacity: 0.55;
+  }
 }
 
 .skeleton-avatar,
 .skeleton-line {
-    animation: skeletonPulse 1.4s ease-in-out infinite;
+  animation: skeletonPulse 1.4s ease-in-out infinite;
 }
 
 @utility prose-flexoki {
