@@ -9,22 +9,18 @@ export default function PrintersPage() {
   const [collapsedCountries, setCollapsedCountries] = useState({});
   const [search, setSearch] = useState("");
 
-  useEffect(()=>{
-    const mockPrinters = [
-      {
-        slack_id: "U001",
-        nickname:"alice",
-        country:"united states"
-      },
-      {
-        slack_id: "U002",
-        nickname:"bob",
-        country:"india"
-      }
-    ];
-    setPrinters(mockPrinters);
-    setLoading(false)
-  })
+  useEffect(() => {
+    fetch(API_URL + "printers")
+      .then((res) => res.json())
+      .then((data) => {
+        setPrinters(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching printers:", error);
+        setLoading(false);
+      });
+  }, []);
 
   if (loading)
     return (

@@ -25,6 +25,7 @@ export default function PrinterCard({ printer }) {
         if (grams >= 1000) return `${(grams / 1000).toFixed(2)} kg`;
         return `${Math.round(grams)} g`;
     };
+    const avatar = profile_pic || "/default-avatar.png";
 
     return (
         <div className="bg-light-bg rounded-lg shadow-md hover:shadow-lg transition-shadow">
@@ -32,12 +33,16 @@ export default function PrinterCard({ printer }) {
                 {/* Left column: fixed width (PFP + stats) */}
                 <div className="w-32 shrink-0 flex flex-col items-center text-center gap-2">
                     <img
-                        src={profile_pic}
-                        alt={nickname}
-                        className="w-24 h-24 rounded-full object-cover border-2 border-light-ui"
-                        onError={(e) => {
-                            e.target.src = "/default-avatar.png";
-                        }}
+                            src={avatar}
+                            alt={nickname}
+                            loading="lazy"
+                            decoding="async"
+                            width={96}
+                            height={96}
+                            className="w-24 h-24 rounded-full object-cover border-2 border-light-ui"
+                            onError={(e) => {
+                                e.currentTarget.src = "/default-avatar.png";
+                            }}
                     />
 
                     <div className="w-full flex flex-col gap-2">

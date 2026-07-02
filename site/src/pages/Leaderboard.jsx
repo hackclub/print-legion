@@ -4,6 +4,7 @@ const baseApiUrl = (import.meta.env.VITE_API_URL || "/api/").replace(
   /\/?$/,
   "/"
 );
+import PrinterCardSkeleton from "../components/PrinterCardSkeleton";
 const LEADERBOARD_URL =
   import.meta.env.VITE_LEADERBOARD_URL || `${baseApiUrl}stats/leaderboard`; // ||
 // "https://printlegion.hackclub.com/api/stats/leaderboard";
@@ -69,9 +70,11 @@ export default function Leaderboard() {
       </h1>
 
       {loading && (
-        <div className="text-center text-2xl py-10">
-          fetching leaderboard...
-        </div>
+        <section className="grid gap-6 md:grid-cols-3 mb-8">
+          {Array.from({length:9}).map((_,i)=>(
+            <PrinterCardSkeleton key={i}/>
+          ))}
+        </section>
       )}
 
       {error && (
@@ -97,14 +100,17 @@ export default function Leaderboard() {
                 <div className="text-5xl font-black text-blue-500 mb-4">
                   #{entry.position}
                 </div>
-                <img
-                  src={entry.profile_pic}
-                  alt={entry.nickname}
-                  className="w-28 h-28 rounded-full object-cover border-4 border-paper mb-4"
-                  onError={(e) => {
-                    e.currentTarget.src = "/default-avatar.png";
-                  }}
-                />
+                <img 
+                src={entry.profile_pic}
+                alt={entry.nickname}
+                loading="lazy"
+                decoding="async"
+                width={112}
+                height={112}
+                className="w-28 h-28 rounded-full object-cover border-4 border-paper mb-4"
+                onError={(e)=>{
+                  e.currentTarget.src="/default-avatar.png"
+                }}/>
                 <h2 className="text-2xl font-semibold mb-1">
                   {entry.nickname}
                 </h2>
@@ -139,6 +145,10 @@ export default function Leaderboard() {
                     <img
                       src={entry.profile_pic}
                       alt={entry.nickname}
+                      loading="lazy"
+                      decoding="async"
+                      width={56}
+                      height={56}
                       className="w-14 h-14 rounded-full object-cover border border-gray-100"
                       onError={(e) => {
                         e.currentTarget.src = "/default-avatar.png";
