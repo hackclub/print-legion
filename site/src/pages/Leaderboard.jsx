@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 
-const baseApiUrl = (import.meta.env.VITE_API_URL || "/api/").replace(
-  /\/?$/,
-  "/"
-);
-const LEADERBOARD_URL =
-  import.meta.env.VITE_LEADERBOARD_URL || `${baseApiUrl}stats/leaderboard`; // ||
+const baseApiUrl = (import.meta.env.VITE_API_URL || "/api/").replace(/\/?$/, "/");
+import PrinterCardSkeleton from "../components/PrinterCardSkeleton";
+const LEADERBOARD_URL = import.meta.env.VITE_LEADERBOARD_URL || `${baseApiUrl}stats/leaderboard`; // ||
 // "https://printlegion.hackclub.com/api/stats/leaderboard";
 
 export default function Leaderboard() {
@@ -25,9 +22,7 @@ export default function Leaderboard() {
         setEntries(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error fetching leaderboard:", err);
-        setError(
-          "We couldn't load the leaderboard right now. Please try again in a bit."
-        );
+        setError("We couldn't load the leaderboard right now. Please try again in a bit.");
       } finally {
         setLoading(false);
       }
@@ -50,40 +45,28 @@ export default function Leaderboard() {
   return (
     <div className="container mx-auto px-4 py-8 w-full">
       <div className="my-6 flex flex-wrap gap-3">
-        <a
-          href="/"
-          className="outline-1 py-2 px-6 rounded-2xl text-xl font-bold"
-        >
+        <a href="/" className="outline-1 py-2 px-6 rounded-2xl text-xl font-bold">
           back
         </a>
-        <a
-          href="/printers"
-          className="outline-1 py-2 px-6 rounded-2xl text-xl font-bold"
-        >
+        <a href="/printers" className="outline-1 py-2 px-6 rounded-2xl text-xl font-bold">
           printers
         </a>
       </div>
 
-      <h1 className="text-3xl mb-8 font-bold text-center">
-        Printing Legion Leaderboard
-      </h1>
+      <h1 className="text-3xl mb-8 font-bold text-center">Printing Legion Leaderboard</h1>
 
       {loading && (
-        <div className="text-center text-2xl py-10">
-          fetching leaderboard...
-        </div>
+        <section className="grid gap-6 md:grid-cols-3 mb-8">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <PrinterCardSkeleton key={i} />
+          ))}
+        </section>
       )}
 
-      {error && (
-        <div className="text-center text-red-600 font-semibold py-4">
-          {error}
-        </div>
-      )}
+      {error && <div className="text-center text-red-600 font-semibold py-4">{error}</div>}
 
       {!loading && !error && !entries.length && (
-        <div className="text-center text-gray-600 py-8">
-          No leaderboard data yet.
-        </div>
+        <div className="text-center text-gray-600 py-8">No leaderboard data yet.</div>
       )}
 
       {!loading && !error && entries.length > 0 && (
@@ -94,23 +77,22 @@ export default function Leaderboard() {
                 key={entry.slack_id}
                 className="bg-dark-ui rounded-lg shadow-lg p-6 flex flex-col items-center text-center border-2 border-paper"
               >
-                <div className="text-5xl font-black text-blue-500 mb-4">
-                  #{entry.position}
-                </div>
+                <div className="text-5xl font-black text-blue-500 mb-4">#{entry.position}</div>
                 <img
                   src={entry.profile_pic}
                   alt={entry.nickname}
+                  loading="lazy"
+                  decoding="async"
+                  width={112}
+                  height={112}
                   className="w-28 h-28 rounded-full object-cover border-4 border-paper mb-4"
                   onError={(e) => {
                     e.currentTarget.src = "/default-avatar.png";
                   }}
                 />
-                <h2 className="text-2xl font-semibold mb-1">
-                  {entry.nickname}
-                </h2>
+                <h2 className="text-2xl font-semibold mb-1">{entry.nickname}</h2>
                 <p className="text-gray-500 mb-4">
-                  {entry.total_prints} prints |{" "}
-                  {formatWeight(entry.total_grams)} total
+                  {entry.total_prints} prints | {formatWeight(entry.total_grams)} total
                 </p>
                 <a
                   href={`https://slack.com/app_redirect?channel=${entry.slack_id}`}
@@ -129,16 +111,15 @@ export default function Leaderboard() {
               </div>
               <div className="divide-y">
                 {rest.map((entry) => (
-                  <div
-                    key={entry.slack_id}
-                    className="px-6 py-4 flex items-center gap-4"
-                  >
-                    <span className="text-2xl font-bold text-gray-400 w-12">
-                      #{entry.position}
-                    </span>
+                  <div key={entry.slack_id} className="px-6 py-4 flex items-center gap-4">
+                    <span className="text-2xl font-bold text-gray-400 w-12">#{entry.position}</span>
                     <img
                       src={entry.profile_pic}
                       alt={entry.nickname}
+                      loading="lazy"
+                      decoding="async"
+                      width={56}
+                      height={56}
                       className="w-14 h-14 rounded-full object-cover border border-gray-100"
                       onError={(e) => {
                         e.currentTarget.src = "/default-avatar.png";
@@ -147,8 +128,7 @@ export default function Leaderboard() {
                     <div className="flex-1">
                       <p className="text-lg font-semibold">{entry.nickname}</p>
                       <p className="text-sm text-gray-500">
-                        {entry.total_prints} prints |{" "}
-                        {formatWeight(entry.total_grams)} printed
+                        {entry.total_prints} prints | {formatWeight(entry.total_grams)} printed
                       </p>
                     </div>
                     <a

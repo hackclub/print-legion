@@ -6,28 +6,28 @@ import rehypeExternalLinks from "rehype-external-links";
 
 // https://vite.dev/config/
 export default defineConfig({
-    server: {
-        proxy: {
-            "/api": {
-                target: "http://localhost:3000/", // Your Express port
-                // changeOrigin: true,
-                // rewrite: (path) => path.replace(/^\/api/, '')
-            },
-        },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:3000/", // Your Express port
+        // changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/api/, '')
+      },
     },
-    plugins: [
-        react(),
-        tailwindcss(),
-        mdx({
-            rehypePlugins: [
-                [
-                    rehypeExternalLinks,
-                    {
-                        target: "_blank",
-                        rel: ["noopener", "noreferrer"],
-                    },
-                ],
-            ],
-        }),
-    ],
+  },
+  plugins: [
+    react(),
+    tailwindcss(),
+    mdx({
+      rehypePlugins: [
+        [
+          rehypeExternalLinks,
+          {
+            target: "_blank",
+            rel: ["noopener", "noreferrer"],
+          },
+        ],
+      ],
+    }),
+  ],
 });

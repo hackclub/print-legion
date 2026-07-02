@@ -20,6 +20,58 @@
     font-display: swap;
   }
 }
+/* skeleton loader*/
+.skeleton-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 12px;
+}
+.skeleton-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.skeleton-content {
+  flex: 1;
+}
+
+.skeleton-line {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  margin: 10px 0;
+}
+
+.skeleton-line.short {
+  width: 40%;
+}
+
+.skeleton-line.medium {
+  width: 70%;
+}
+
+@keyframes skeletonPulse {
+  0% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton-avatar,
+.skeleton-line {
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
 
 @utility prose-flexoki {
   --tw-prose-body: var(--color-dark-tx);
