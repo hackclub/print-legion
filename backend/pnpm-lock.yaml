@@ -26,6 +26,10 @@ importers:
       path:
         specifier: ^0.12.7
         version: 0.12.7
+    devDependencies:
+      prettier:
+        specifier: ^3.9.4
+        version: 3.9.4
 
 packages:
 
@@ -335,6 +339,11 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
+
+  prettier@3.9.4:
+    resolution: {integrity: sha512-yWG/o/4oJfo036EKAfK6ACAoDOfHeRHx4tuxkfBZiauURiaSmYwlpOr5LQqKtIkRD2z1PLteme2WoxEnj4tHTg==}
+    engines: {node: '>=14'}
+    hasBin: true
 
   process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
@@ -780,6 +789,8 @@ snapshots:
       util: 0.10.4
 
   picomatch@2.3.1: {}
+
+  prettier@3.9.4: {}
 
   process@0.11.10: {}
 
