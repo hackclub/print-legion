@@ -316,6 +316,9 @@
       } finally {
         busy = false;
         if (first) done();
+        // The end marker can still be on screen once this page lands. Re-observing
+        // makes the observer report its current state, so the feed keeps going.
+        if (next) { observer.unobserve(end); observer.observe(end); }
       }
     };
 
