@@ -449,6 +449,7 @@ b { font-weight: 600; }
   transition: opacity .3s ease, visibility .3s;
 }
 .loader.is-done { opacity: 0 !important; visibility: hidden; animation: none; }
+.loader.is-loading { opacity: 1 !important; visibility: visible !important; animation: none !important; }
 .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 28px; padding: 24px; }
 .loader-logo { display: flex; align-items: center; gap: 6px; font-family: var(--display); font-size: 48px; line-height: 1; }
 .loader-logo img { width: 37px; height: 37px; animation: wobble 1s ease-in-out infinite; }

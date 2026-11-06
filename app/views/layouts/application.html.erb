@@ -15,7 +15,7 @@
     <%= javascript_include_tag "app", defer: true %>
   </head>
   <body class="<%= content_for(:body_class) %>" data-live="<%= content_for(:live) %>">
-    <% if content_for?(:live) %><%= render "shared/loader" %><% end %>
+    <%= render "shared/loader" %>
     <div class="page">
       <%= render "shared/nav" %>
       <main class="main"><%= yield %></main>

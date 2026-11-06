@@ -5,7 +5,12 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-  const done = () => loader && loader.classList.add("is-done");
+  const done = () => {
+    if (!loader) return;
+    loader.classList.remove("is-loading");
+    loader.classList.add("is-done");
+    try { sessionStorage.removeItem("pl-loading"); } catch (_) {}
+  };
   const getJSON = async (url) => {
     const t0 = performance.now();
     const res = await fetch(url, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(8000) });
@@ -17,6 +22,19 @@
   const fmtKg = (grams) => (grams / 1000).toFixed(2);
   const isWide = (p) => p.w && p.h && p.w / p.h > 1.25;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // Show the loader the moment a nav link is clicked, so the wait happens under it
+  // rather than on a blank page while the next page is being rendered.
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[href]");
+    if (!a || !loader || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if ((a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+    try { sessionStorage.setItem("pl-loading", "1"); } catch (_) {}
+    loader.classList.add("is-loading");
+  });
+  window.addEventListener("pageshow", (e) => { if (e.persisted && loader) loader.classList.remove("is-loading"); });
 
   // ---------- logo: hop to the next sprite every 15s ----------
   const logoCat = $(".logo-cat");
