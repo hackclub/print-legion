@@ -1,7 +1,8 @@
 <header class="nav">
+  <% logo = (content_for(:logo).presence || "calicat-1.png benchy.png calicube.png").split %>
   <a class="logo" href="<%= root_path %>" aria-label="print legion home">
-    <span>print</span><%= image_tag "calicat-1.png", alt: "", class: "logo-cat",
-        data: { cycle: %w[calicat-1.png benchy.png calicube.png].map { image_path(_1) }.join(" ") } %><span>legion</span>
+    <span>print</span><%= image_tag logo.first, alt: "", class: "logo-cat",
+        data: { cycle: logo.map { image_path(_1) }.join(" ") } %><span>legion</span>
   </a>
   <nav class="nav-links">
     <a class="sticker sticker-printers" href="<%= printers_path %>">
