@@ -168,7 +168,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .hero-text { display: flex; flex-direction: column; gap: 13px; font-weight: 600; }
 .hero-lede { font-size: 24px; text-align: justify; }
 .hero-note { font-size: 12px; }
-.hero-ctas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 21px; }
+.hero-ctas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 40px; padding: 0 21px; }
 .hero-ctas .cta { width: 100%; }
 .cta {
   position: relative;
@@ -521,7 +521,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   .hero { flex-direction: column; align-items: stretch; gap: 37px; margin-top: 25px; }
   .hero-copy { width: 100%; gap: 29px; }
   .hero-lede { font-size: 24px; text-align: justify; }
-  .hero-ctas { grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 0 0 21px; }
+  .hero-ctas { grid-template-columns: 1fr 1fr; gap: 16px 36px; padding: 0 0 0 21px; }
   .steps-scroll {
     display: flex; order: -1;
     margin-right: calc(-1 * var(--gutter));
@@ -566,7 +566,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   .footer-right { justify-self: end; }
 }
 
-@media (max-width: 410px) {
+@media (max-width: 499px) {
   .hero-ctas { grid-template-columns: 1fr; row-gap: 16px; }
   .tally { column-gap: 14px; }
   .tally-row { font-size: 24px; gap: 8px; }
