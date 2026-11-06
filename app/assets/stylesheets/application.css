@@ -503,17 +503,17 @@ b { font-weight: 600; }
   /* Phone layout from the "iPhone Air" frame: big centred logo, nav pinned to
      the bottom, steps and print strips running off the screen edge. */
   :root { --gutter: 18px; }
-  .page { padding-top: 19px; padding-bottom: 20px; }
+  .page { padding-top: 19px; padding-bottom: 110px; }
 
-  /* The header's two halves join the page flow: logo on top, nav buttons at
-     the very end of the page, after the footer (not pinned to the screen). */
+  /* The header's two halves join the page flow: logo on top, nav buttons
+     pinned to the bottom of the screen. */
   .nav { display: contents; }
   .logo { align-self: center; }
   .main { order: 1; }
   .footer { order: 2; }
   .logo { font-size: clamp(40px, 15.2vw, 64px); gap: 6px; }
   .logo-cat { width: clamp(33px, 12.6vw, 53px); height: clamp(33px, 12.6vw, 53px); }
-  .nav-links { order: 3; align-self: center; gap: 19px; margin-top: 95px; }
+  .nav-links { position: fixed; bottom: 14px; left: 50%; translate: -50% 0; z-index: 20; gap: 19px; }
 
   .hero { flex-direction: column; align-items: stretch; gap: 37px; margin-top: 25px; }
   .hero-copy { width: 100%; gap: 29px; }
