@@ -1,4 +1,4 @@
-# Airtable wiring for Printing Legion.
+# Airtable wiring for Print Legion.
 #
 # Field IDs (not names) are used for reads so that renaming a column in
 # Airtable doesn't break the site. Formulas still have to reference names.

@@ -1,6 +1,6 @@
 # print legion
 
-The Printing Legion site, built in Rails 8 from the Figma "final" page.
+The Print Legion site, built in Rails 8 from the Figma "final" page.
 
 ```
 bundle install
