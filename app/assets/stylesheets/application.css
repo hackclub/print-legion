@@ -520,13 +520,14 @@ b { font-weight: 600; }
   .hero-lede { font-size: 24px; text-align: justify; }
   .hero-ctas { gap: clamp(16px, 8.3vw, 35px); padding: 0 0 0 21px; flex-wrap: nowrap; }
   .steps-scroll {
-    display: block; order: -1;
+    display: flex; order: -1;
     margin-right: calc(-1 * var(--gutter));
     overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain;
   }
   .steps-scroll::-webkit-scrollbar { display: none; }
   .steps { grid-template-columns: repeat(3, 291px); width: max-content; max-width: none; }
   .step { scroll-snap-align: start; }
+  .steps-scroll::after { content: ""; flex: none; width: var(--gutter); }
   .step-head { font-size: 12px; height: 35px; min-height: 0; white-space: nowrap; }
   .step-img { aspect-ratio: 1344 / 1024; }
 
