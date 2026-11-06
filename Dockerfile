@@ -1,32 +1,26 @@
-# Use official Node.js image as the base
-FROM node:20-alpine
+FROM ruby:3.3-slim
 
-# Set working directory
 WORKDIR /app
 
-# Copy backend files
-COPY backend ./backend
+ENV RAILS_ENV=production \
+    BUNDLE_WITHOUT=development:test \
+    BUNDLE_DEPLOYMENT=1 \
+    RAILS_SERVE_STATIC_FILES=1
 
-# Copy site (frontend) files
-COPY site ./site
+# build-essential compiles puma's native extension.
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y build-essential && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install backend dependencies
-WORKDIR /app/backend
-RUN npm install --production || yarn install --production || pnpm install --prod
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
 
-# Build frontend
-WORKDIR /app/site
-RUN npm install || yarn install || pnpm install
-RUN npm run build
+COPY . .
 
-# Serve built frontend with backend
-WORKDIR /app/backend
+# Fingerprints assets. No real secret is needed at build time.
+RUN SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile
 
-# Copy built frontend to backend's public directory (if needed)
-# RUN mkdir -p ./public && cp -r /app/site/dist/* ./public/
-
-# Expose port (Express default)
 EXPOSE 3000
 
-# Start the backend server
-CMD ["node", "index.js"]
+# SECRET_KEY_BASE and AIRTABLE_API_KEY (or AIRTABLE_KEY) must be provided at runtime.
+CMD ["bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]

@@ -1,0 +1,25 @@
+<header class="nav">
+  <a class="logo" href="<%= root_path %>" aria-label="print legion home">
+    <span>print</span><%= image_tag "calicat-1.png", alt: "", class: "logo-cat",
+        data: { cycle: %w[calicat-1.png benchy.png calicube.png].map { image_path(_1) }.join(" ") } %><span>legion</span>
+  </a>
+  <nav class="nav-links">
+    <a class="sticker sticker-printers" href="<%= printers_path %>">
+      <%= image_tag "guygreen.png", alt: "", class: "s s1" %>
+      <%= image_tag "guygreen.png", alt: "", class: "s s2" %>
+      <%= image_tag "guyblue.png", alt: "", class: "s s3" %>
+      <span class="sticker-label">printers</span>
+    </a>
+    <a class="sticker sticker-docs" href="<%= doc_path("printers") %>">
+      <%= image_tag "docs.png", alt: "", class: "s s1" %>
+      <%= image_tag "docs.png", alt: "", class: "s s2" %>
+      <span class="sticker-label">docs</span>
+    </a>
+    <a class="sticker sticker-prints" href="<%= prints_path %>">
+      <%= image_tag "calicat.png", alt: "", class: "s s1" %>
+      <%= image_tag "benchy.png", alt: "", class: "s s2" %>
+      <%= image_tag "calicube.png", alt: "", class: "s s3" %>
+      <span class="sticker-label">prints</span>
+    </a>
+  </nav>
+</header>

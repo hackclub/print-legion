@@ -1,0 +1,52 @@
+<% content_for :live, "home" %>
+<section class="hero">
+  <div class="hero-copy">
+    <div class="hero-text">
+      <p class="hero-lede">Print Legion is an international network of <span class="c-orange">3D printers</span> around the world from Hack Club!</p>
+      <p class="hero-note">*Only for <a class="c-red u i" href="https://hackclub.com" target="_blank" rel="noopener">Hack Clubbers</a>!</p>
+    </div>
+    <div class="hero-ctas">
+      <a class="cta cta-cyan" href="<%= ApplicationHelper::SLACK_CHANNEL %>" target="_blank" rel="noopener">
+        <%= image_tag "calicube.png", alt: "", class: "cta-icon cta-icon-cube" %>request a print
+      </a>
+      <a class="cta cta-orange" href="<%= doc_path("printers") %>">
+        <%= image_tag "calicat.png", alt: "", class: "cta-icon cta-icon-cat" %>become a printer
+      </a>
+    </div>
+  </div>
+
+  <div class="steps-scroll">
+  <ol class="steps">
+    <li class="step step-1">
+      <div class="step-head">request a print in&nbsp;<a class="u i" href="<%= ApplicationHelper::SLACK_CHANNEL %>" target="_blank" rel="noopener">#printing-legion</a></div>
+      <%= image_tag "step-1.png", alt: "A Slack message asking for a print", class: "step-img" %>
+    </li>
+    <li class="step step-2">
+      <div class="step-head">find a printer and get it printed!</div>
+      <%= image_tag "step-2.png", alt: "A 3D printer printing a boat", class: "step-img" %>
+    </li>
+    <li class="step step-3">
+      <div class="step-head">get it delivered to your home!!!</div>
+      <%= image_tag "step-3.png", alt: "A happy person holding their print", class: "step-img" %>
+    </li>
+  </ol>
+  </div>
+</section>
+
+<a class="showcase" href="<%= prints_path %>" aria-label="see recent prints">
+  <div class="reel" id="reel">
+    <div class="reel-track">
+      <% 7.times do |i| %><div class="reel-card is-skeleton" style="--i: <%= i %>"></div><% end %>
+    </div>
+  </div>
+  <div class="tally">
+    <div class="tally-row"><span class="tally-icons"><%= image_tag "calicube.png", alt: "" %></span><span><%= @countries %> countries</span></div>
+    <div class="tally-row"><span class="tally-icons"><%= image_tag "calicat.png", alt: "", class: "tally-extra" %><%= image_tag "sprite-0009.png", alt: "" %></span><span><span data-stat="kgs">–</span> kgs</span></div>
+    <div class="tally-row"><span class="tally-icons"><%= image_tag "sprite-0007.png", alt: "", class: "tally-extra" %><%= image_tag "benchy.png", alt: "" %></span><span><span data-stat="spools">–</span> spools</span></div>
+    <div class="tally-row"><span class="tally-icons"><%= image_tag "docs.png", alt: "" %></span><span><span data-stat="projects">–</span> projects</span></div>
+  </div>
+  <%# phones get a second strip under the numbers, moving the other way %>
+  <div class="reel reel-2" id="reel-2" aria-hidden="true">
+    <div class="reel-track"></div>
+  </div>
+</a>

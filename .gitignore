@@ -1,0 +1,12 @@
+/.bundle
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+/public/assets
+/.env*
+!/.env.example
+/.venv
+
+# Rails secrets
+/config/master.key

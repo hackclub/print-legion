@@ -1,0 +1,79 @@
+<% content_for :title, "printers · print legion" %>
+<% content_for :live, "printers" %>
+<%= render "shared/back" %>
+<div class="title-row">
+  <h1 class="page-title">printers</h1>
+  <div class="controls">
+    <div class="control">
+      <span class="control-label" id="place-label">place</span>
+      <div class="dropdown" data-dropdown="place">
+        <button type="button" class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="place-label">
+          <span class="dropdown-value">🌐 world</span>
+          <%= image_tag "chevron-down.svg", alt: "", class: "dropdown-chevron", width: 16, height: 16 %>
+        </button>
+        <ul class="dropdown-menu" role="listbox" hidden>
+          <li role="option" data-value="" aria-selected="true">🌐 world</li>
+          <% @countries.each do |country| %>
+            <li role="option" data-value="<%= country %>"><%= flag(country) %> <%= country_label(country) %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+    <div class="control">
+      <span class="control-label" id="sort-label">sort by</span>
+      <div class="dropdown" data-dropdown="sort">
+        <button type="button" class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="sort-label">
+          <span class="dropdown-value">🏆 prints (count)</span>
+        </button>
+        <button type="button" class="sort-flip" aria-label="reverse order" title="reverse order" aria-pressed="false"><%= image_tag "sort.svg", alt: "", width: 16, height: 16 %></button>
+        <ul class="dropdown-menu" role="listbox" hidden>
+          <li role="option" data-value="count" aria-selected="true">🏆 prints (count)</li>
+          <li role="option" data-value="weight">🏋️ weight (kg)</li>
+          <li role="option" data-value="alpha">🅰️ alphabetical (aA)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="control control-search">
+      <label class="control-label" for="printer-search">search</label>
+      <div class="search">
+        <%= image_tag "search.svg", alt: "", width: 16, height: 16 %>
+        <input id="printer-search" type="search" placeholder="search a printer..." autocomplete="off" spellcheck="false">
+        <button type="button" class="search-clear" aria-label="clear search" hidden><%= image_tag "x.svg", alt: "", width: 16, height: 16 %></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="printer-grid" id="printer-grid">
+  <% @printers.each do |p| %>
+    <article class="printer-card" data-id="<%= p.id %>" data-name="<%= p.name.downcase %>" data-country="<%= p.country %>"
+             data-search="<%= [p.name, p.country, p.bio].join(" ").downcase %>">
+      <span class="rank-badge" hidden></span>
+      <% if p.website || p.slack_id %>
+        <div class="links">
+          <% if p.website %><a class="pill pill-orange" href="<%= p.website %>" target="_blank" rel="noopener nofollow">website</a><% end %>
+          <% if p.slack_id %><a class="pill pill-cyan" href="<%= slack_url(p.slack_id) %>" target="_blank" rel="noopener">slack</a><% end %>
+        </div>
+      <% end %>
+      <div class="printer-top">
+        <div class="printer-id">
+          <% if p.avatar %>
+            <img class="avatar" src="<%= p.avatar %>" alt="" loading="lazy" decoding="async" width="31" height="31">
+          <% else %>
+            <span class="avatar avatar-blank"><%= p.name.first.upcase %></span>
+          <% end %>
+          <div>
+            <h2 class="printer-name"><span><%= p.name %></span><span class="medal"></span></h2>
+            <p class="printer-country"><%= flag(p.country) %> <%= p.country || "somewhere" %></p>
+          </div>
+        </div>
+        <% if p.bio.present? %><p class="printer-bio"><%= p.bio %></p><% end %>
+      </div>
+      <div class="printer-stats">
+        <span class="stat"><%= image_tag "benchy.png", alt: "" %><span data-prints>–</span> prints</span>
+        <span class="stat"><%= image_tag "calicat.png", alt: "" %><span data-kgs>–</span> kgs</span>
+      </div>
+    </article>
+  <% end %>
+</div>
+<p class="empty" id="printer-empty" hidden>no printers match that… yet! 🐱</p>
