@@ -24,6 +24,7 @@ module AirtableConfig
     printer: "fldYKimyppP7Shpf7",
     created: "fldPRrCmf4UzsK6ye",
     program: "fldXfIWlLUgVxzsMM",
+    sent_to_country: "fldQejFiO8Xdyv9jQ", # "Sent to Country (full)", text; counts every print
     # Checkbox that hides a print from the site. Formulas need the name, not the ID.
     exclude_name: ENV["AIRTABLE_PRINT_EXCLUDE_FIELD"].presence || "Exclude on website"
   }.freeze

@@ -18,6 +18,8 @@ class PrinterDirectory
   PROFILE_PARTITIONS = %w[^rec[0-9A-F] ^rec[G-V] ^rec[W-Za-f] ^rec[g-z]].freeze
   STATS_PARTITION = "^rec[0-9A-Za-f]".freeze
   GRAMS_PER_SPOOL = 750.0
+  # Airtable spellings that should count as the same country as the usual name.
+  COUNTRY_ALIASES = { "korea, south" => "South Korea" }.freeze
 
   class << self
     def client = AirtableClient.instance
@@ -86,11 +88,16 @@ class PrinterDirectory
 
     def fetch_stats
       fields = P.values_at(:total_grams, :prints, :active)
+      country_fields = [R[:sent_to_country]]
       batches = client.parallel(
         -> { client.list(P[:table], fields:, formula: %(AND({prints}, REGEX_MATCH(RECORD_ID(), "#{STATS_PARTITION}"))), all_pages: true).first },
-        -> { client.list(P[:table], fields:, formula: %(AND({prints}, NOT(REGEX_MATCH(RECORD_ID(), "#{STATS_PARTITION}")))), all_pages: true).first }
+        -> { client.list(P[:table], fields:, formula: %(AND({prints}, NOT(REGEX_MATCH(RECORD_ID(), "#{STATS_PARTITION}")))), all_pages: true).first },
+        # Every print, not just approved ones, so the country count matches the project totals.
+        -> { client.list(R[:table], fields: country_fields, formula: %(REGEX_MATCH(RECORD_ID(), "#{STATS_PARTITION}")), all_pages: true).first },
+        -> { client.list(R[:table], fields: country_fields, formula: %(NOT(REGEX_MATCH(RECORD_ID(), "#{STATS_PARTITION}"))), all_pages: true).first }
       )
-      everyone = batches.flatten.uniq { _1["id"] }.to_h do |rec|
+      printer_batches, print_batches = batches.each_slice(2).to_a
+      everyone = printer_batches.flatten.uniq { _1["id"] }.to_h do |rec|
         f = rec["fields"]
         [rec["id"], { "prints" => Array(f[P[:prints]]).size, "grams" => f[P[:total_grams]].to_f.round(1), "active" => !!f[P[:active]] }]
       end
@@ -105,8 +112,17 @@ class PrinterDirectory
         "kgs" => (grams / 1000).round(2),
         "spools" => (grams / GRAMS_PER_SPOOL).floor,
         "projects" => everyone.values.sum { _1["prints"] },
+        "countries" => count_countries(print_batches.flatten),
         "printers" => active
       }
+    end
+
+    # Distinct, trimmed country names across all prints. Blank cells are skipped.
+    def count_countries(rows)
+      rows.flat_map { Array(_1["fields"]&.dig(R[:sent_to_country])) }
+          .map { _1.to_s.strip }.reject(&:empty?)
+          .map { |c| COUNTRY_ALIASES.fetch(c.downcase, c) }
+          .uniq(&:downcase).size
     end
 
     def fetch_prints(limit, offset, photos_only)

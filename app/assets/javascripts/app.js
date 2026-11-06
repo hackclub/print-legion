@@ -119,6 +119,7 @@
       $("[data-stat=kgs]").textContent = stats.kgs.toFixed(2);
       $("[data-stat=spools]").textContent = stats.spools;
       $("[data-stat=projects]").textContent = stats.projects;
+      $("[data-stat=countries]").textContent = stats.countries;
       // Desktop strip runs right-to-left. On phones the top strip runs left-to-right
       // and the second one (phones only, starting half-way through) right-to-left.
       const phone = matchMedia("(max-width: 640px)");
