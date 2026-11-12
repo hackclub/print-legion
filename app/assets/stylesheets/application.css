@@ -978,6 +978,7 @@ body[data-live="home"] .main {
 }
 .print-photo {
     display: block;
+    position: relative;
     height: 220px;
     border-radius: 7px;
     overflow: hidden;
@@ -1010,6 +1011,21 @@ body[data-live="home"] .main {
     min-width: 0;
 }
 .print-caption > span:first-child {
+    white-space: nowrap;
+}
+/* "3 days ago" tag in the photo's top-right corner */
+.print-when {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    padding: 1.5px 5px;
+    border-radius: 2px;
+    background: var(--light-100);
+    color: var(--dark-200);
+    font-size: 12px;
+    font-weight: 500;
+    font-style: italic;
     white-space: nowrap;
 }
 .chip {
