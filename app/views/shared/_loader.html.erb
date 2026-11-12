@@ -1,4 +1,6 @@
-<div class="loader" id="loader" role="status" aria-live="polite">
+<%# passive: the page shows its own placeholders, so the loader only covers navigating away %>
+<% passive = local_assigns[:passive] %>
+<div class="loader<%= " is-passive" if passive %>" id="loader" role="status" aria-live="polite">
   <div class="loader-inner">
     <div class="loader-logo"><span>print</span><%= image_tag "calicat-1.png", alt: "" %><span>legion</span></div>
     <div class="loader-sprites" aria-hidden="true">
@@ -7,7 +9,11 @@
       <%= image_tag "benchy.png", alt: "" %>
       <%= image_tag "guygreen.png", alt: "" %>
     </div>
-    <p class="loader-text">warming up the printers…</p>
+    <p class="loader-text">fetching new data…</p>
   </div>
 </div>
+<% if passive %>
+<script>try { sessionStorage.removeItem("pl-loading"); } catch (_) {}</script>
+<% else %>
 <script>try { if (sessionStorage.getItem("pl-loading")) document.getElementById("loader").classList.add("is-loading"); } catch (_) {}</script>
+<% end %>

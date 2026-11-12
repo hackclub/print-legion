@@ -31,6 +31,7 @@
     if ((a.target && a.target !== "_self") || a.hasAttribute("download")) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+    if (url.pathname.startsWith("/docs")) return; // docs are static, no loader on the way in
     try { sessionStorage.setItem("pl-loading", "1"); } catch (_) {}
     loader.classList.add("is-loading");
   });
