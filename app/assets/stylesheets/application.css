@@ -147,6 +147,10 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .sticker-printers .s3 { width: 60.13px; height: 60.13px; left: 24.91px; top: 4.44px; }
 .sticker-printers .sticker-label { left: 16px; top: 23px; }
 
+.sticker-me { width: 74px; height: 68px; }
+.sticker-me .s1 { --r1: rotate(-6deg); width: 60px; height: 60px; left: 7px; top: 4px; transform: var(--r1); }
+.sticker-me .sticker-label { left: 24px; top: 23px; }
+
 .sticker-docs { width: 84px; height: 65px; }
 .sticker-docs .s1 { --r1: rotate(-12.92deg); width: 52px; height: 52px; left: 5.15px; top: 8.15px; transform: var(--r1); }
 .sticker-docs .s2 { --r2: rotate(0deg); width: 64px; height: 64px; left: 20px; top: 0; }
@@ -672,6 +676,8 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   .logo { font-size: clamp(40px, 15.2vw, 64px); gap: 6px; }
   .logo-cat { width: clamp(33px, 12.6vw, 53px); height: clamp(33px, 12.6vw, 53px); }
   .nav-links { position: fixed; bottom: 14px; left: 50%; translate: -50% 0; z-index: 20; gap: 10px; padding: 6px 10px; background: var(--light-100); border: 3px solid var(--light-300); border-radius: 999px; }
+  /* four stickers (~452px) don't fit a phone at full size: shrink the whole pill */
+  .nav-links { scale: .78; transform-origin: 50% 100%; }
 
   .hero { flex-direction: column; align-items: stretch; gap: 37px; margin-top: 25px; }
   .hero-copy { width: 100%; gap: 29px; }
@@ -725,4 +731,8 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   .hero-ctas { grid-template-columns: 1fr; row-gap: 16px; }
   .tally { column-gap: 14px; }
   .tally-row { font-size: 24px; gap: 8px; }
+}
+
+@media (max-width: 360px) {
+  .nav-links { scale: .68; }
 }

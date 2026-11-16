@@ -5,6 +5,10 @@
         data: { cycle: logo.map { image_path(_1) }.join(" ") } %><span>legion</span>
   </a>
   <nav class="nav-links">
+    <a class="sticker sticker-me" href="<%= signed_in? ? dashboard_path : login_path %>">
+      <%= image_tag "guyred.png", alt: "", class: "s s1" %>
+      <span class="sticker-label">me</span>
+    </a>
     <a class="sticker sticker-printers" href="<%= printers_path %>">
       <%= image_tag "guygreen.png", alt: "", class: "s s1" %>
       <%= image_tag "guygreen.png", alt: "", class: "s s2" %>
