@@ -49,7 +49,7 @@
             <span class="dash-grant-purpose"><%= g[:purpose] || "grant card" %></span>
             <span class="dash-print-meta"><%= g[:issued] ? "issued #{g[:issued].strftime("%-d %b %Y")}" : "issue date unknown" %></span>
           </span>
-          <% if g[:url] %><a class="pill pill-cyan" href="<%= g[:url] %>" target="_blank" rel="noopener">open card</a><% end %>
+          <% if g[:url] %><a class="pill pill-cyan" href="<%= g[:url] %>" target="_blank" rel="noopener">view card</a><% end %>
         </li>
       <% end %>
     </ol>
