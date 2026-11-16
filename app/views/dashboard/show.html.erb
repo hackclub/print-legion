@@ -37,16 +37,18 @@
         <dt>Hackatime</dt>
         <dd>
           <span class="dash-badge is-<%= e.hackatime || "none" %>"><%= e.hackatime || "not set" %></span>
-          <span class="dash-hint"><%= { "red" => "Red means you can't take prints for now. Ask in #printing-legion if that looks wrong.", nil => "Not checked yet." }.fetch(e.hackatime, "All good.") %></span>
+          <% unless e.hackatime %><span class="dash-hint">Not checked yet.</span><% end %>
         </dd>
       </div>
       <div class="dash-check">
         <dt>YSWS eligibility <span class="dash-hint">(Hack Club Auth)</span></dt>
         <dd>
           <span class="dash-badge <%= e.ysws_ok? ? "is-green" : (e.ysws_checked? ? "is-red" : "is-none") %>"><%= e.ysws_label %></span>
-          <span class="dash-hint"><%= e.ysws_note %>
-            <% if e.ysws_checked? && !e.ysws_ok? %><a class="u" href="<%= HackClubAuthConfig::HOST %>" target="_blank" rel="noopener">Open Hack Club Auth</a><% end %>
-          </span>
+          <% unless e.ysws_ok? %>
+            <span class="dash-hint"><%= e.ysws_note %>
+              <% if e.ysws_checked? %><a class="u" href="<%= HackClubAuthConfig::HOST %>" target="_blank" rel="noopener">Open Hack Club Auth</a><% end %>
+            </span>
+          <% end %>
         </dd>
       </div>
     </dl>
