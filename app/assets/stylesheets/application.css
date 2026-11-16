@@ -461,7 +461,9 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   background: var(--light-200);
   border: 1px solid var(--light-300); border-radius: 7px;
 }
-.dash-heading { font-size: 24px; font-weight: 700; font-style: italic; line-height: 29px; }
+.dash-heading { font-size: 24px; font-weight: 700; line-height: 29px; }
+.dash-signout-button { border-color: var(--red-100) !important; color: var(--red-100); font-weight: 600; }
+.dash-signout-button:hover { background: var(--red-100); color: var(--light-100); }
 .dash-grants-page { margin-top: 40px; }
 .dash-text { font-size: 15px; line-height: 1.45; }
 .dash-hint { font-size: 12px; font-weight: 500; color: var(--dark-100); }

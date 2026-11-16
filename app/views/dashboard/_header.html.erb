@@ -5,7 +5,7 @@
     <% { profile: dashboard_path, stats: dashboard_stats_path, grants: dashboard_grants_path }.each do |tab, path| %>
       <a class="docs-tab<%= " is-active" if active == tab %>" href="<%= path %>"<%= ' aria-current="page"'.html_safe if active == tab %>><%= tab %></a>
     <% end %>
-    <%= button_to "sign out", logout_path, method: :delete, class: "docs-tab", form_class: "dash-signout" %>
+    <%= button_to "sign out", logout_path, method: :delete, class: "docs-tab dash-signout-button", form_class: "dash-signout" %>
   </nav>
 </div>
 <% if flash[:notice] %><p class="flash flash-ok" role="status"><%= flash[:notice] %></p><% end %>
