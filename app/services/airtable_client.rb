@@ -52,11 +52,10 @@ class AirtableClient
     [records, offset]
   end
 
-  # One record, fields keyed by ID.
+  # One record, fields keyed by ID. The single-record endpoint has no fields[]
+  # filter (Airtable answers 422), so `fields` is accepted but every field comes back.
   def find(table, id, fields: nil)
-    params = [["returnFieldsByFieldId", "true"]]
-    Array(fields).each { |f| params << ["fields[]", f] }
-    request(:get, "/v0/#{@base_id}/#{table}/#{record_id!(id)}?#{URI.encode_www_form(params)}")
+    request(:get, "/v0/#{@base_id}/#{table}/#{record_id!(id)}?returnFieldsByFieldId=true")
   end
 
   # Sets the given fields (keys are field IDs) on one record. Returns the record.
