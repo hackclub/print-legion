@@ -27,9 +27,68 @@
   <% if @prints.empty? %>
     <p class="dash-empty">No prints logged yet. Your first one will show up here.</p>
   <% else %>
-    <ol class="dash-prints">
+    <% events = @prints.filter_map { _1[:event] }.tally.sort_by { |e, n| [-n, e.downcase] }.map(&:first) %>
+    <div class="controls dash-controls">
+      <div class="control">
+        <span class="control-label" id="status-label">status</span>
+        <div class="dropdown" data-dropdown="status">
+          <button type="button" class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="status-label">
+            <span class="dropdown-value">all statuses</span>
+            <%= image_tag "chevron-down.svg", alt: "", class: "dropdown-chevron", width: 16, height: 16 %>
+          </button>
+          <ul class="dropdown-menu" role="listbox" hidden>
+            <li role="option" data-value="" aria-selected="true">all statuses</li>
+            <li role="option" data-value="approved">✅ approved</li>
+            <li role="option" data-value="pending">⏳ pending</li>
+            <li role="option" data-value="duplicate">♻️ duplicate</li>
+          </ul>
+        </div>
+      </div>
+      <div class="control">
+        <span class="control-label" id="event-label">event</span>
+        <div class="dropdown" data-dropdown="event">
+          <button type="button" class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="event-label">
+            <span class="dropdown-value">all events</span>
+            <%= image_tag "chevron-down.svg", alt: "", class: "dropdown-chevron", width: 16, height: 16 %>
+          </button>
+          <ul class="dropdown-menu" role="listbox" hidden>
+            <li role="option" data-value="" aria-selected="true">all events</li>
+            <% events.each do |ev| %><li role="option" data-value="<%= ev %>"><%= ev %></li><% end %>
+          </ul>
+        </div>
+      </div>
+      <div class="control">
+        <span class="control-label" id="psort-label">sort by</span>
+        <div class="dropdown" data-dropdown="psort">
+          <button type="button" class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="psort-label">
+            <span class="dropdown-value">📅 date</span>
+          </button>
+          <button type="button" class="sort-flip" aria-label="reverse order" title="reverse order" aria-pressed="false"><%= image_tag "sort.svg", alt: "", width: 16, height: 16 %></button>
+          <ul class="dropdown-menu" role="listbox" hidden>
+            <li role="option" data-value="date" aria-selected="true">📅 date</li>
+            <li role="option" data-value="weight">🏋️ weight (g)</li>
+            <li role="option" data-value="shipping">📦 shipping ($)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="control control-search">
+        <label class="control-label" for="print-search">search</label>
+        <div class="search">
+          <%= image_tag "search.svg", alt: "", width: 16, height: 16 %>
+          <input id="print-search" type="search" placeholder="person, tracking, date, event..." autocomplete="off" spellcheck="false">
+          <button type="button" class="search-clear" aria-label="clear search" hidden><%= image_tag "x.svg", alt: "", width: 16, height: 16 %></button>
+        </div>
+      </div>
+    </div>
+    <p class="dash-empty" id="dash-prints-empty" hidden>No prints match.</p>
+    <ol class="dash-prints" id="dash-prints">
       <% @prints.each do |p| %>
-        <li class="dash-print">
+        <% who = p[:recipient] && @recipients[p[:recipient]] %>
+        <% status = p[:duplicate] ? "duplicate" : (p[:approved] ? "approved" : "pending") %>
+        <li class="dash-print" data-status="<%= status %>" data-event="<%= p[:event] %>"
+            data-date="<%= p[:created]&.to_i || 0 %>" data-grams="<%= p[:grams] %>" data-shipping="<%= p[:shipping] %>"
+            data-search="<%= [p[:event], p[:country], who&.name, p[:recipient], p[:tracking],
+                              p[:created]&.strftime("%-d %b %Y"), p[:created]&.strftime("%-d %B %Y"), p[:created]&.strftime("%Y-%m-%d"), status].compact.join(" ").downcase %>">
           <% if p[:image] %>
             <img class="dash-thumb" src="<%= p[:image] %>" alt="" loading="lazy">
           <% else %>

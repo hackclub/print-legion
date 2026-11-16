@@ -330,6 +330,63 @@
     if (next) observer.observe(end);
   }
 
+  // ---------- dashboard: search, filter and sort the printer's own prints ----------
+  function printFilters() {
+    const list = $("#dash-prints");
+    if (!list) return;
+    const rows = $$(".dash-print", list);
+    const params = new URLSearchParams(location.search);
+    const state = {
+      status: params.get("status") || "",
+      event: params.get("event") || "",
+      sort: params.get("sort") || "date",
+      reversed: params.get("dir") === "rev",
+      q: params.get("q") || "",
+    };
+    const num = (r, k) => Number(r.dataset[k]) || 0;
+    const render = () => {
+      const q = state.q.trim().toLowerCase();
+      let shown = 0;
+      rows.forEach((r) => {
+        const show = (!state.status || r.dataset.status === state.status) &&
+          (!state.event || r.dataset.event === state.event) && (!q || r.dataset.search.includes(q));
+        r.hidden = !show;
+        if (show) shown++;
+      });
+      const key = { date: "date", weight: "grams", shipping: "shipping" }[state.sort];
+      const sorted = [...rows].sort((a, b) => num(b, key) - num(a, key) || num(b, "date") - num(a, "date"));
+      if (state.reversed) sorted.reverse();
+      list.append(...sorted);
+      $("#dash-prints-empty").hidden = shown > 0;
+
+      const url = new URLSearchParams();
+      if (state.status) url.set("status", state.status);
+      if (state.event) url.set("event", state.event);
+      if (state.sort !== "date") url.set("sort", state.sort);
+      if (state.reversed) url.set("dir", "rev");
+      if (q) url.set("q", state.q);
+      history.replaceState(null, "", url.size ? `?${url}` : location.pathname);
+    };
+    const status = dropdown($("[data-dropdown=status]"), (v) => { state.status = v; render(); });
+    const event = dropdown($("[data-dropdown=event]"), (v) => { state.event = v; render(); });
+    const sort = dropdown($("[data-dropdown=psort]"), (v) => { state.sort = v; render(); });
+    status.select(state.status);
+    event.select(state.event);
+    sort.select(state.sort);
+
+    const flip = $(".dash-controls .sort-flip");
+    flip.setAttribute("aria-pressed", String(state.reversed));
+    flip.addEventListener("click", () => { state.reversed = !state.reversed; flip.setAttribute("aria-pressed", String(state.reversed)); render(); });
+
+    const input = $("#print-search");
+    const clear = $(".dash-controls .search-clear");
+    input.value = state.q;
+    clear.hidden = !state.q;
+    input.addEventListener("input", () => { state.q = input.value; clear.hidden = !input.value; render(); });
+    clear.addEventListener("click", () => { input.value = ""; input.dispatchEvent(new Event("input")); input.focus(); });
+    render();
+  }
+
   // ---------- dashboard ----------
   function dashboard() {
     done();
@@ -363,6 +420,8 @@
       field.addEventListener("input", show);
       show();
     });
+    printFilters();
+
     // One click, one save: grey the button out while the form is sent.
     $$("form.dash-form, form.dash-hcb-form").forEach((form) => {
       form.addEventListener("submit", () => {

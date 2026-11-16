@@ -558,6 +558,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .dash-recipient-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .dash-recipient .dash-mono { flex: none; color: var(--dark-100); }
 .dash-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; padding: 1px 5px; border-radius: 4px; background: var(--light-300); }
+.dash-controls { flex-wrap: wrap; }
 .dash-print-side { display: flex; align-items: center; gap: 8px; }
 .dash-status { padding: 2px 7px; border-radius: 7px; font-size: 11px; font-weight: 600; font-style: italic; border: 1px solid var(--dark-200); }
 .dash-status.is-ok { background: var(--green-100); }
