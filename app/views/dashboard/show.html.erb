@@ -4,11 +4,18 @@
 <% content_for :logo, "guyblue.png guyred.png guygreen.png" %>
 <%= render "dashboard/header", title: "hey, #{@account.name}!", active: :profile %>
 
+<% e = @eligibility %>
 <div class="dash">
-  <section class="dash-card dash-send">
+  <div class="dash-col">
+  <section class="dash-card dash-send<%= " is-locked" if e.locked? %>">
     <h2 class="dash-heading">sent a print?</h2>
     <p class="dash-text">Log every print you ship, so it shows up on the site and in your stats.</p>
-    <% if @form_url %>
+    <% if e.locked? %>
+      <span class="cta cta-orange dash-cta is-disabled" aria-disabled="true">
+        <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>log a sent print
+      </span>
+      <p class="dash-hint">Locked until your eligibility checks pass (see below).</p>
+    <% elsif @form_url %>
       <a class="cta cta-orange dash-cta" href="<%= @form_url %>" target="_blank" rel="noopener">
         <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>log a sent print
       </a>
@@ -16,6 +23,35 @@
       <p class="dash-hint">The sent-print form link is coming soon.</p>
     <% end %>
   </section>
+
+  <section class="dash-card dash-elig">
+    <h2 class="dash-heading">eligibility</h2>
+    <% if e.locked? %>
+      <p class="dash-lock" role="status">
+        <%= @switched_off ? "We've set you to inactive" : "You're inactive" %> because your <%= e.reasons.to_sentence.downcase.sub("hackatime", "Hackatime").sub("ysws", "YSWS") %>.
+        Once that's sorted, you can switch yourself back on.
+      </p>
+    <% end %>
+    <dl class="dash-checks">
+      <div class="dash-check">
+        <dt>Hackatime</dt>
+        <dd>
+          <span class="dash-badge is-<%= e.hackatime || "none" %>"><%= e.hackatime || "not set" %></span>
+          <span class="dash-hint"><%= { "red" => "Red means you can't take prints for now. Ask in #printing-legion if that looks wrong.", nil => "Not checked yet." }.fetch(e.hackatime, "All good.") %></span>
+        </dd>
+      </div>
+      <div class="dash-check">
+        <dt>YSWS eligibility <span class="dash-hint">(Hack Club Auth)</span></dt>
+        <dd>
+          <span class="dash-badge <%= e.ysws_ok? ? "is-green" : (e.ysws_checked? ? "is-red" : "is-none") %>"><%= e.ysws_label %></span>
+          <span class="dash-hint"><%= e.ysws_note %>
+            <% if e.ysws_checked? && !e.ysws_ok? %><a class="u" href="<%= HackClubAuthConfig::HOST %>" target="_blank" rel="noopener">Open Hack Club Auth</a><% end %>
+          </span>
+        </dd>
+      </div>
+    </dl>
+  </section>
+  </div>
 
   <section class="dash-card dash-profile">
     <h2 class="dash-heading">your profile</h2>
@@ -41,12 +77,13 @@
         <span class="control-label">bio <span class="dash-count" data-count-for="profile_bio"></span></span>
         <%= f.text_area :bio, value: @account.bio, maxlength: PrinterAccount::BIO_MAX, rows: 4, placeholder: "What you print on, what you like printing…", class: "dash-input dash-textarea" %>
       </label>
-      <label class="dash-toggle">
-        <%= f.check_box :active, { checked: @account.active, class: "dash-toggle-input", role: "switch" }, "1", "0" %>
+      <label class="dash-toggle<%= " is-locked" if !@account.active && !e.can_activate? %>">
+        <% toggle_off = !@account.active && !e.can_activate? %>
+        <%= f.check_box :active, { checked: @account.active, disabled: toggle_off, class: "dash-toggle-input", role: "switch" }, "1", "0" %>
         <span class="dash-toggle-track" aria-hidden="true"></span>
         <span class="dash-toggle-text">
           <b>active</b>
-          <span class="dash-hint">Active printers are listed on the printers page. Switch this off if you're taking a break.</span>
+          <span class="dash-hint"><%= toggle_off ? "Locked until your eligibility checks pass." : "Active printers are listed on the printers page. Switch this off if you're taking a break." %></span>
         </span>
       </label>
       <%= f.submit "save", class: "cta cta-cyan dash-save" %>

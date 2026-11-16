@@ -28,7 +28,7 @@ class SessionsController < ApplicationController
 
     identity = HackClubAuth.identify(code:, redirect_uri:)
     if (printer_id = PrinterAccount.record_id_for(identity))
-      sign_in!(printer_id)
+      sign_in!(printer_id, hca_id: identity.id)
       redirect_to dashboard_path
     else
       reset_session

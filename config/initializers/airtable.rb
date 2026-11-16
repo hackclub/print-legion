@@ -19,6 +19,7 @@ module AirtableConfig
     email: "fldXRE6VWYqFB0cjL", # also their HCB email; printers can change it
     total_prints: "fldYp5mgwaflSimaz",
     grants: "fldnHbwaOwsH6ChYh", # "Grants Issued" links
+    hackatime: "fld2Y5zNk4jPZyz3D", # hackatime_status: blue, green, red or blank
     # Formula names (formulas can't use field IDs).
     slack_id_name: "slack_id",
     email_name: "email"

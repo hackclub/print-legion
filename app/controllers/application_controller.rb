@@ -25,9 +25,10 @@ class ApplicationController < ActionController::Base
   end
 
   # A new session on every sign-in, so a cookie planted beforehand is useless.
-  def sign_in!(printer_id)
+  def sign_in!(printer_id, hca_id: nil)
     reset_session
     session[:printer_id] = printer_id
+    session[:hca_id] = hca_id # Hack Club Auth identity, for the eligibility check
     session[:signed_in_at] = Time.now.to_i
   end
 end

@@ -8,7 +8,7 @@ class PrinterAccount
   P = AirtableConfig::PRINTERS
   R = AirtableConfig::PRINTS
 
-  Account = Struct.new(:id, :name, :avatar, :bio, :email, :country, :active,
+  Account = Struct.new(:id, :name, :avatar, :bio, :email, :country, :active, :slack_id, :hackatime,
                        :total_grams, :print_ids, :grant_ids, keyword_init: true)
   Invalid = Class.new(StandardError) # message is safe to show the printer
 
@@ -38,7 +38,8 @@ class PrinterAccount
     # ---- reading ---------------------------------------------------------------
 
     def load(id)
-      fields = P.values_at(:display_name, :profile_picture, :bio, :email, :country, :active, :total_grams, :prints, :grants)
+      fields = P.values_at(:display_name, :profile_picture, :bio, :email, :country, :active, :slack_id, :hackatime,
+                           :total_grams, :prints, :grants)
       rec = client.find(P[:table], id, fields:)
       f = rec["fields"]
       avatar = Array(f[P[:profile_picture]]).last
@@ -50,6 +51,8 @@ class PrinterAccount
         email: f[P[:email]].presence,
         country: f[P[:country]].presence,
         active: !!f[P[:active]],
+        slack_id: f[P[:slack_id]].to_s.strip.presence,
+        hackatime: f[P[:hackatime]].to_s.strip.downcase.presence,
         total_grams: f[P[:total_grams]].to_f,
         # Only plain IDs reach the formula below (letters and digits, nothing to escape).
         print_ids: Array(f[P[:prints]]).grep(/\Arec[A-Za-z0-9]{1,30}\z/),

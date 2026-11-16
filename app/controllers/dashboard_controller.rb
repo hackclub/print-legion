@@ -11,6 +11,13 @@ class DashboardController < ApplicationController
   def show
     @account = PrinterAccount.load(current_printer_id)
     @form_url = sent_print_form_url
+    @eligibility = Eligibility.for(@account, hca_id: session[:hca_id])
+    # A failing check switches the printer off (and keeps them off: see update_profile).
+    if @eligibility.locked? && @account.active
+      PrinterAccount.update_details(current_printer_id, active: false)
+      @account.active = false
+      @switched_off = true
+    end
   end
 
   def stats
@@ -28,17 +35,23 @@ class DashboardController < ApplicationController
   def update_profile
     raw = params[:profile]
     profile = raw.is_a?(ActionController::Parameters) ? raw.permit(:display_name, :bio, :active, :avatar) : {}
-    saved = PrinterAccount.update_details(
-      current_printer_id,
-      name: profile[:display_name].presence,
-      bio: profile[:bio],
-      active: profile.key?(:active) ? ActiveModel::Type::Boolean.new.cast(profile[:active]) : nil
-    )
+    active = profile.key?(:active) ? ActiveModel::Type::Boolean.new.cast(profile[:active]) : nil
+    blocked = nil
+    # Switching on needs both eligibility checks to pass, whatever the form sent.
+    if active
+      eligibility = Eligibility.for(PrinterAccount.load(current_printer_id), hca_id: session[:hca_id])
+      unless eligibility.can_activate?
+        active = nil
+        blocked = "You can't switch to active right now (#{eligibility.reasons.presence&.to_sentence || "couldn't check your eligibility"})."
+      end
+    end
+    saved = PrinterAccount.update_details(current_printer_id, name: profile[:display_name].presence, bio: profile[:bio], active:)
     if profile[:avatar].present?
       PrinterAccount.update_avatar(current_printer_id, profile[:avatar])
       saved << "picture"
     end
-    redirect_to dashboard_path, notice: saved.any? ? "Saved your #{saved.to_sentence}." : "Nothing to change."
+    notice = saved.any? ? "Saved your #{saved.to_sentence}." : ("Nothing to change." unless blocked)
+    redirect_to dashboard_path, notice:, alert: blocked
   rescue PrinterAccount::Invalid => e
     redirect_to dashboard_path, alert: e.message
   end

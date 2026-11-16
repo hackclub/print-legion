@@ -497,6 +497,22 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .dash-toggle-input:checked + .dash-toggle-track::after { transform: translateX(20px); }
 .dash-toggle-input:focus-visible + .dash-toggle-track { outline: 2px dashed var(--dark-200); outline-offset: 3px; }
 .dash-toggle-text { display: flex; flex-direction: column; gap: 3px; font-size: 15px; }
+.dash-col { display: flex; flex-direction: column; gap: 34px; min-width: 0; }
+.dash-card.is-locked .dash-heading, .dash-card.is-locked .dash-text { opacity: .55; }
+.cta.is-disabled { background: var(--light-300); color: var(--dark-100); cursor: not-allowed; filter: grayscale(1); }
+.cta.is-disabled:hover { background: var(--light-300); }
+.cta.is-disabled .cta-icon { transform: none; }
+.dash-toggle.is-locked { cursor: not-allowed; opacity: .5; filter: grayscale(1); }
+.dash-lock { padding: 10px 12px; border-radius: 7px; border: 1px solid var(--dark-200); background: var(--red-100); color: var(--light-100); font-weight: 600; font-size: 14px; line-height: 1.4; }
+.dash-checks { display: flex; flex-direction: column; gap: 14px; margin: 0; }
+.dash-check { display: flex; flex-direction: column; gap: 6px; }
+.dash-check dt { font-weight: 700; font-size: 15px; }
+.dash-check dd { margin: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+.dash-badge { padding: 2px 9px; border-radius: 7px; border: 1px solid var(--dark-200); font-size: 12px; font-weight: 700; font-style: italic; }
+.dash-badge.is-blue { background: var(--cyan-100); }
+.dash-badge.is-green { background: var(--green-100); }
+.dash-badge.is-red { background: var(--red-100); color: var(--light-100); }
+.dash-badge.is-none { background: var(--light-300); }
 .dash-save { align-self: flex-start; padding: 5px 22px; border: 0; cursor: pointer; color: var(--dark-200); }
 .dash-save:disabled { opacity: .6; cursor: progress; }
 
