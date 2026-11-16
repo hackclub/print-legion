@@ -63,7 +63,7 @@ class PrinterAccount
     # The printer's prints, newest first, fetched 40 IDs at a time in parallel.
     def prints(account)
       fields = R.values_at(:created, :program, :print_image, :sent_to_country, :weight_grams, :tracking,
-                           :shipping_cost, :approved, :duplicate, :shipping_grant, :message_url, :printer)
+                           :shipping_cost, :approved, :duplicate, :shipping_grant, :message_url, :printer, :recipient)
       jobs = account.print_ids.each_slice(40).map do |ids|
         formula = "OR(#{ids.map { "RECORD_ID()='#{_1}'" }.join(",")})"
         -> { client.list(R[:table], fields:, formula:, all_pages: true).first }
@@ -85,6 +85,7 @@ class PrinterAccount
           duplicate: !!f[R[:duplicate]],
           grant_url: safe_url(f[R[:shipping_grant]]),
           message_url: safe_url(f[R[:message_url]]),
+          recipient: f[R[:recipient]].to_s[/\b[UW][A-Z0-9]{6,20}\b/],
           image: image && (image.dig("thumbnails", "large", "url") || image["url"])
         }
       end.sort_by { -(_1[:created]&.to_i || 0) }

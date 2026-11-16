@@ -39,6 +39,7 @@ module AirtableConfig
     duplicate: "fldzXmIGXuzlSAFhw",
     shipping_grant: "fldDKvrdYPtMlgOj9", # "HCB Grant (Shipping)" link
     message_url: "fldZgAuEky6xhRooi",
+    recipient: "fldosutiMB5qJEQ5N", # slack_id_recipient
     # Checkbox that hides a print from the site. Formulas need the name, not the ID.
     exclude_name: ENV["AIRTABLE_PRINT_EXCLUDE_FIELD"].presence || "Exclude on website"
   }.freeze

@@ -23,6 +23,7 @@ class DashboardController < ApplicationController
   def stats
     @account = PrinterAccount.load(current_printer_id)
     @prints = PrinterAccount.prints(@account)
+    @recipients = SlackDirectory.people(@prints.filter_map { _1[:recipient] })
     @grants = begin
       GrantLedger.for_account(@account)
     rescue AirtableClient::Error => e # grants are extra: keep the rest of the page

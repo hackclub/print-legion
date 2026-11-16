@@ -39,6 +39,19 @@
             <div class="dash-print-title">
               <%= p[:event] ? "for #{p[:event]}" : "a print" %><%= " → #{p[:country]}" if p[:country] %>
             </div>
+            <% if (rid = p[:recipient]) %>
+              <% who = @recipients[rid] %>
+              <div class="dash-recipient">
+                <span class="dash-recipient-label">to</span>
+                <% if who&.avatar %>
+                  <img class="dash-recipient-avatar" src="<%= who.avatar %>" alt="" loading="lazy" referrerpolicy="no-referrer">
+                <% else %>
+                  <span class="dash-recipient-avatar is-blank"><%= (who&.name || "?").first.upcase %></span>
+                <% end %>
+                <span class="dash-recipient-name"><%= who&.name || "a Hack Clubber" %></span>
+                <span class="dash-mono">(<%= rid %>)</span>
+              </div>
+            <% end %>
             <div class="dash-print-meta">
               <%= p[:created]&.strftime("%-d %b %Y") || "no date" %>
               <% if p[:grams].positive? %> · <%= number_with_precision(p[:grams], precision: 0, delimiter: ",") %> g<% end %>

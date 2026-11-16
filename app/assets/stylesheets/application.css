@@ -543,6 +543,12 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .dash-print-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .dash-print-title { font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dash-print-meta { font-size: 12px; font-weight: 500; color: var(--dark-100); }
+.dash-recipient { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 13px; }
+.dash-recipient-label { font-weight: 500; color: var(--dark-100); }
+.dash-recipient-avatar { width: 20px; height: 20px; flex: none; border-radius: 4px; object-fit: cover; background: var(--light-300); }
+.dash-recipient-avatar.is-blank { display: grid; place-items: center; font-size: 11px; font-weight: 700; color: var(--dark-100); }
+.dash-recipient-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.dash-recipient .dash-mono { flex: none; color: var(--dark-100); }
 .dash-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; }
 .dash-print-side { display: flex; align-items: center; gap: 8px; }
 .dash-status { padding: 2px 7px; border-radius: 7px; font-size: 11px; font-weight: 600; font-style: italic; border: 1px solid var(--dark-200); }
