@@ -27,11 +27,13 @@ class DashboardController < ApplicationController
 
   def update_profile
     raw = params[:profile]
-    profile = raw.is_a?(ActionController::Parameters) ? raw.permit(:display_name, :avatar) : {}
-    saved = []
-    if profile[:display_name].present? && PrinterAccount.update_name(current_printer_id, profile[:display_name])
-      saved << "name"
-    end
+    profile = raw.is_a?(ActionController::Parameters) ? raw.permit(:display_name, :bio, :active, :avatar) : {}
+    saved = PrinterAccount.update_details(
+      current_printer_id,
+      name: profile[:display_name].presence,
+      bio: profile[:bio],
+      active: profile.key?(:active) ? ActiveModel::Type::Boolean.new.cast(profile[:active]) : nil
+    )
     if profile[:avatar].present?
       PrinterAccount.update_avatar(current_printer_id, profile[:avatar])
       saved << "picture"

@@ -355,6 +355,14 @@
         old.replaceWith(img);
       });
     }
+    // Live character count for the bio.
+    $$("[data-count-for]").forEach((out) => {
+      const field = document.getElementById(out.dataset.countFor);
+      if (!field) return;
+      const show = () => { out.textContent = `${field.value.length}/${field.maxLength}`; };
+      field.addEventListener("input", show);
+      show();
+    });
     // One click, one save: grey the button out while the form is sent.
     $$("form.dash-form, form.dash-hcb-form").forEach((form) => {
       form.addEventListener("submit", () => {

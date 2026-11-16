@@ -37,6 +37,18 @@
         <span class="control-label">display name</span>
         <%= f.text_field :display_name, value: @account.name, maxlength: PrinterAccount::NAME_MAX, required: true, autocomplete: "nickname", class: "dash-input" %>
       </label>
+      <label class="dash-field">
+        <span class="control-label">bio <span class="dash-count" data-count-for="profile_bio"></span></span>
+        <%= f.text_area :bio, value: @account.bio, maxlength: PrinterAccount::BIO_MAX, rows: 4, placeholder: "What you print on, what you like printing…", class: "dash-input dash-textarea" %>
+      </label>
+      <label class="dash-toggle">
+        <%= f.check_box :active, { checked: @account.active, class: "dash-toggle-input", role: "switch" }, "1", "0" %>
+        <span class="dash-toggle-track" aria-hidden="true"></span>
+        <span class="dash-toggle-text">
+          <b>active</b>
+          <span class="dash-hint">Active printers are listed on the printers page. Switch this off if you're taking a break.</span>
+        </span>
+      </label>
       <%= f.submit "save", class: "cta cta-cyan dash-save" %>
     <% end %>
   </section>

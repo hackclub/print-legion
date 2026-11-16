@@ -8,11 +8,12 @@ class PrinterAccount
   P = AirtableConfig::PRINTERS
   R = AirtableConfig::PRINTS
 
-  Account = Struct.new(:id, :name, :avatar, :email, :country, :active,
+  Account = Struct.new(:id, :name, :avatar, :bio, :email, :country, :active,
                        :total_grams, :print_ids, :grant_ids, keyword_init: true)
   Invalid = Class.new(StandardError) # message is safe to show the printer
 
   NAME_MAX = 40
+  BIO_MAX = 500
   AVATAR_MAX_BYTES = 5 * 1024 * 1024 # Airtable's upload limit
   AVATAR_TYPES = {
     "image/png" => ["png", "\x89PNG\r\n\x1A\n".b],
@@ -37,7 +38,7 @@ class PrinterAccount
     # ---- reading ---------------------------------------------------------------
 
     def load(id)
-      fields = P.values_at(:display_name, :profile_picture, :email, :country, :active, :total_grams, :prints, :grants)
+      fields = P.values_at(:display_name, :profile_picture, :bio, :email, :country, :active, :total_grams, :prints, :grants)
       rec = client.find(P[:table], id, fields:)
       f = rec["fields"]
       avatar = Array(f[P[:profile_picture]]).last
@@ -45,6 +46,7 @@ class PrinterAccount
         id: rec["id"],
         name: f[P[:display_name]].to_s.strip.presence || "printer",
         avatar: avatar&.dig("thumbnails", "large", "url") || avatar&.dig("url"),
+        bio: f[P[:bio]].to_s.strip,
         email: f[P[:email]].presence,
         country: f[P[:country]].presence,
         active: !!f[P[:active]],
@@ -87,16 +89,35 @@ class PrinterAccount
 
     # ---- writing (all scoped to the session's record) ----------------------------
 
-    def update_name(id, raw)
-      name = raw.to_s.unicode_normalize(:nfc).gsub(/[[:cntrl:]]/, "").squish
-      raise Invalid, "Your name can't be empty." if name.empty?
-      raise Invalid, "Keep your name to #{NAME_MAX} characters." if name.length > NAME_MAX
-      current = client.find(P[:table], id, fields: [P[:display_name]]).dig("fields", P[:display_name]).to_s.strip
-      return nil if current == name # unchanged: no write
+    # Name, bio and active flag in one write. nil means "not sent, leave it".
+    # Returns the labels of what actually changed (nothing changed: no write).
+    def update_details(id, name: nil, bio: nil, active: nil)
+      wanted = {}
+      unless name.nil?
+        name = name.to_s.unicode_normalize(:nfc).gsub(/[[:cntrl:]]/, "").squish
+        raise Invalid, "Your name can't be empty." if name.empty?
+        raise Invalid, "Keep your name to #{NAME_MAX} characters." if name.length > NAME_MAX
+        wanted[:display_name] = name
+      end
+      unless bio.nil?
+        bio = bio.to_s.unicode_normalize(:nfc).gsub("\r\n", "\n")
+                 .gsub(/[[:cntrl:]&&[^\n]]/, "")   # keep line breaks, drop other control characters
+                 .gsub(/[ \t]+$/, "").gsub(/\n{3,}/, "\n\n").strip
+        raise Invalid, "Keep your bio to #{BIO_MAX} characters." if bio.length > BIO_MAX
+        wanted[:bio] = bio
+      end
+      wanted[:active] = active unless active.nil?
+      return [] if wanted.empty?
 
-      client.update(P[:table], id, P[:display_name] => name)
+      current = client.find(P[:table], id)["fields"]
+      now = { display_name: current[P[:display_name]].to_s.strip, bio: current[P[:bio]].to_s.strip, active: !!current[P[:active]] }
+      changes = wanted.reject { |k, v| now[k] == v }
+      return [] if changes.empty?
+
+      client.update(P[:table], id, changes.to_h { |k, v| [P[k], v] })
       expire_public_profiles
-      name
+      Rails.cache.delete("live:stats:v1") if changes.key?(:active) # rank list follows active printers
+      changes.keys.map { { display_name: "name", bio: "bio", active: "active status" }[_1] }
     end
 
     # Replaces the profile picture with an uploaded file (ActionDispatch upload).
