@@ -148,8 +148,9 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .sticker-printers .sticker-label { left: 16px; top: 23px; }
 
 .sticker-me { width: 74px; height: 68px; }
-.sticker-me .s1 { --r1: rotate(-6deg); width: 60px; height: 60px; left: 7px; top: 4px; transform: var(--r1); }
-.sticker-me .sticker-label { left: 24px; top: 23px; }
+.sticker-me .s1 { width: 60px; height: 60px; left: 7px; top: 4px; }
+.sticker-me .sticker-label { left: 50%; translate: -50% 0; top: 23px; }
+.sticker.sticker-me:hover .s1 { transform: translateY(-5px); }
 
 .sticker-docs { width: 84px; height: 65px; }
 .sticker-docs .s1 { --r1: rotate(-12.92deg); width: 52px; height: 52px; left: 5.15px; top: 8.15px; transform: var(--r1); }
