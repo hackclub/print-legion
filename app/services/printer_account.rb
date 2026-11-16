@@ -108,8 +108,10 @@ class PrinterAccount
       raise Invalid, "Use a PNG, JPG, GIF or WebP picture." unless type
 
       before = Array(client.find(P[:table], id).dig("fields", P[:profile_picture])).map { _1["id"] }
-      rec = client.upload_attachment(id, P[:profile_picture], content_type: type, filename: "avatar-#{Time.now.to_i}.#{ext}", data:)
-      fresh = Array(rec.dig("fields", P[:profile_picture])).reject { before.include?(_1["id"]) }.last
+      client.upload_attachment(id, P[:profile_picture], content_type: type, filename: "avatar-#{Time.now.to_i}.#{ext}", data:)
+      # Read it back by field ID rather than trusting the upload response's keys.
+      after = Array(client.find(P[:table], id).dig("fields", P[:profile_picture]))
+      fresh = after.reject { before.include?(_1["id"]) }.last
       raise Invalid, "Airtable didn't take the picture. Try again?" unless fresh
       # Keep only the new picture.
       client.update(P[:table], id, P[:profile_picture] => [{ "id" => fresh["id"] }])
