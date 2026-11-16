@@ -387,6 +387,21 @@
     render();
   }
 
+  // ---------- dashboard: filter grants by purpose ----------
+  function grantFilter() {
+    const list = $("#dash-grants");
+    const root = $("[data-dropdown=purpose]");
+    if (!list || !root) return;
+    const rows = $$(".dash-grant", list);
+    let purpose = new URLSearchParams(location.search).get("purpose") || "";
+    const render = () => {
+      rows.forEach((r) => { r.hidden = !!purpose && r.dataset.purpose !== purpose; });
+      history.replaceState(null, "", purpose ? `?${new URLSearchParams({ purpose })}` : location.pathname);
+    };
+    dropdown(root, (v) => { purpose = v; render(); }).select(purpose);
+    render();
+  }
+
   // ---------- dashboard ----------
   function dashboard() {
     done();
@@ -421,6 +436,7 @@
       show();
     });
     printFilters();
+    grantFilter();
 
     // One click, one save: grey the button out while the form is sent.
     $$("form.dash-form, form.dash-hcb-form").forEach((form) => {

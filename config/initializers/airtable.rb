@@ -49,7 +49,9 @@ module AirtableConfig
     table: "tbl6ygoiDkgC7Zln5",
     card_url: "fldTuUESKeiQjeUFX",
     printer: "fldegQ8RN87iJG3zD",
-    purpose: "fld8ysthUgfnpwPl7"
+    purpose: "fld8ysthUgfnpwPl7",
+    amount: "fldkdqNIOQfVwhYXL", # USD, as issued on HCB
+    issued: "fldjI8ZwqDlKXjCUe"  # date issued on HCB
   }.freeze
 
   # Cache windows. Profiles change rarely; live numbers get only a short

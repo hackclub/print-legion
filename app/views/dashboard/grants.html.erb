@@ -25,11 +25,30 @@
   <% elsif @grants.empty? %>
     <p class="dash-empty">No grants issued to you yet.</p>
   <% else %>
-    <ol class="dash-grants">
+    <% purposes = @grants.filter_map { _1[:purpose] }.tally.sort_by { |pu, n| [-n, pu.downcase] }.map(&:first) %>
+    <div class="controls dash-controls">
+      <div class="control">
+        <span class="control-label" id="purpose-label">purpose</span>
+        <div class="dropdown" data-dropdown="purpose">
+          <button type="button" class="dropdown-button" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="purpose-label">
+            <span class="dropdown-value">all purposes</span>
+            <%= image_tag "chevron-down.svg", alt: "", class: "dropdown-chevron", width: 16, height: 16 %>
+          </button>
+          <ul class="dropdown-menu" role="listbox" hidden>
+            <li role="option" data-value="" aria-selected="true">all purposes</li>
+            <% purposes.each do |pu| %><li role="option" data-value="<%= pu %>"><%= pu %></li><% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <ol class="dash-grants" id="dash-grants">
       <% @grants.each do |g| %>
-        <li class="dash-grant">
-          <span class="dash-grant-purpose"><%= g[:purpose] || "grant card" %></span>
-          <span class="dash-print-meta"><%= g[:issued] ? "issued #{g[:issued].strftime("%-d %b %Y")}" : "" %></span>
+        <li class="dash-grant" data-purpose="<%= g[:purpose] %>">
+          <span class="dash-grant-amount"><%= g[:amount] ? number_to_currency(g[:amount], precision: (g[:amount] % 1).zero? ? 0 : 2) : "–" %></span>
+          <span class="dash-grant-info">
+            <span class="dash-grant-purpose"><%= g[:purpose] || "grant card" %></span>
+            <span class="dash-print-meta"><%= g[:issued] ? "issued #{g[:issued].strftime("%-d %b %Y")}" : "issue date unknown" %></span>
+          </span>
           <% if g[:url] %><a class="pill pill-cyan" href="<%= g[:url] %>" target="_blank" rel="noopener">open card</a><% end %>
         </li>
       <% end %>
