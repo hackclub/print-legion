@@ -1,0 +1,11 @@
+<%= render "shared/back" %>
+<div class="title-row">
+  <h1 class="page-title"><%= title %></h1>
+  <nav class="dash-tabs" aria-label="dashboard">
+    <a class="docs-tab<%= " is-active" if active == :profile %>" href="<%= dashboard_path %>"<%= ' aria-current="page"'.html_safe if active == :profile %>>profile</a>
+    <a class="docs-tab<%= " is-active" if active == :stats %>" href="<%= dashboard_stats_path %>"<%= ' aria-current="page"'.html_safe if active == :stats %>>stats</a>
+    <%= button_to "sign out", logout_path, method: :delete, class: "docs-tab", form_class: "dash-signout" %>
+  </nav>
+</div>
+<% if flash[:notice] %><p class="flash flash-ok" role="status"><%= flash[:notice] %></p><% end %>
+<% if flash[:alert] %><p class="flash flash-bad" role="alert"><%= flash[:alert] %></p><% end %>

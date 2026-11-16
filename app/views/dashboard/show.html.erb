@@ -1,0 +1,43 @@
+<% content_for :title, "dashboard · print legion" %>
+<% content_for :live, "dashboard" %>
+<% content_for :favicon, "guyblue.png" %>
+<% content_for :logo, "guyblue.png guyred.png guygreen.png" %>
+<%= render "dashboard/header", title: "hey, #{@account.name}!", active: :profile %>
+
+<div class="dash">
+  <section class="dash-card dash-send">
+    <h2 class="dash-heading">sent a print?</h2>
+    <p class="dash-text">Log every print you ship, so it shows up on the site and in your stats.</p>
+    <% if @form_url %>
+      <a class="cta cta-orange dash-cta" href="<%= @form_url %>" target="_blank" rel="noopener">
+        <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>log a sent print
+      </a>
+    <% else %>
+      <p class="dash-hint">The sent-print form link is coming soon.</p>
+    <% end %>
+  </section>
+
+  <section class="dash-card dash-profile">
+    <h2 class="dash-heading">your profile</h2>
+    <p class="dash-text">This is how you show up on the printers page.</p>
+    <%= form_with url: dashboard_profile_path, method: :patch, scope: :profile, multipart: true, class: "dash-form", data: { profile_form: true } do |f| %>
+      <div class="dash-avatar-row">
+        <% if @account.avatar %>
+          <img class="dash-avatar" src="<%= @account.avatar %>" alt="your profile picture" data-avatar-preview>
+        <% else %>
+          <span class="dash-avatar avatar-blank" data-avatar-preview><%= @account.name.first.upcase %></span>
+        <% end %>
+        <label class="dash-file">
+          <%= f.file_field :avatar, accept: "image/png,image/jpeg,image/gif,image/webp", class: "dash-file-input", data: { avatar_input: true } %>
+          <span class="docs-tab">change picture</span>
+          <span class="dash-hint" data-avatar-name>PNG, JPG, GIF or WebP, up to 5 MB</span>
+        </label>
+      </div>
+      <label class="dash-field">
+        <span class="control-label">display name</span>
+        <%= f.text_field :display_name, value: @account.name, maxlength: PrinterAccount::NAME_MAX, required: true, autocomplete: "nickname", class: "dash-input" %>
+      </label>
+      <%= f.submit "save", class: "cta cta-cyan dash-save" %>
+    <% end %>
+  </section>
+</div>

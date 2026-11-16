@@ -330,5 +330,41 @@
     if (next) observer.observe(end);
   }
 
-  ({ home, printers, prints }[page] || done)();
+  // ---------- dashboard ----------
+  function dashboard() {
+    done();
+    const input = $("[data-avatar-input]");
+    const name = $("[data-avatar-name]");
+    if (input) {
+      input.addEventListener("change", () => {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          input.value = "";
+          name.textContent = "That picture is over 5 MB. Try a smaller one.";
+          return;
+        }
+        name.textContent = file.name;
+        // Swap whatever is there (photo or initial) for a preview of the pick.
+        const old = $("[data-avatar-preview]");
+        const img = document.createElement("img");
+        img.className = "dash-avatar";
+        img.alt = "your new profile picture";
+        img.dataset.avatarPreview = "";
+        img.src = URL.createObjectURL(file);
+        old.replaceWith(img);
+      });
+    }
+    // One click, one save: grey the button out while the form is sent.
+    $$("form.dash-form, form.dash-hcb-form").forEach((form) => {
+      form.addEventListener("submit", () => {
+        const btn = $("[type=submit]", form);
+        if (!btn) return;
+        btn.disabled = true;
+        btn.value = "saving…";
+      });
+    });
+  }
+
+  ({ home, printers, prints, dashboard }[page] || done)();
 })();
