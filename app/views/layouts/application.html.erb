@@ -15,7 +15,8 @@
     <%= javascript_include_tag "app", defer: true %>
   </head>
   <body class="<%= content_for(:body_class) %>" data-live="<%= content_for(:live) %>">
-    <%= render "shared/loader" %>
+    <%= render "shared/loader", passive: content_for(:live) == "home" || content_for?(:passive_loader) %>
+    <a class="hc-banner" href="https://hackclub.com/"><img src="https://assets.hackclub.com/banners/2026.svg" alt="Hack Club"></a>
     <div class="page">
       <%= render "shared/nav" %>
       <main class="main"><%= yield %></main>

@@ -161,7 +161,8 @@ class PrinterDirectory
           "printer" => printer&.name,
           "printer_id" => printer&.id,
           "avatar" => printer&.avatar,
-          "event" => f[R[:program]].presence
+          "event" => f[R[:program]].presence,
+          "created" => f[R[:created]].presence || rec["createdTime"]
         }
       end
       { "items" => items, "next" => next_offset }

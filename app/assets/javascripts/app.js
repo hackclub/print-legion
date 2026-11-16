@@ -31,6 +31,7 @@
     if ((a.target && a.target !== "_self") || a.hasAttribute("download")) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+    if (url.pathname.startsWith("/docs")) return; // docs are static, no loader on the way in
     try { sessionStorage.setItem("pl-loading", "1"); } catch (_) {}
     loader.classList.add("is-loading");
   });
@@ -264,6 +265,15 @@
     return placeholders[h % placeholders.length];
   };
 
+  // "today", "yesterday", "12 days ago", counted in calendar days in the viewer's timezone.
+  const daysAgo = (iso) => {
+    const then = new Date(iso);
+    if (isNaN(then)) return null;
+    const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const days = Math.max(0, Math.round((midnight(new Date()) - midnight(then)) / 86400000));
+    return days === 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`;
+  };
+
   function printCard(p) {
     const el = document.createElement("article");
     el.className = `print-card${isWide(p) ? " is-wide" : ""}`;
@@ -271,9 +281,11 @@
     const avatar = !p.printer ? "" : p.avatar
       ? `<img class="chip-avatar" src="${esc(p.avatar)}" alt="" loading="lazy">`
       : `<span class="chip-avatar"></span>`;
+    const ago = p.created && daysAgo(p.created);
+    const when = ago ? `<time class="print-when" datetime="${esc(p.created)}" title="${esc(new Date(p.created).toLocaleDateString())}">${ago}</time>` : "";
     const event = p.event ? `<div class="print-caption print-event"><span>for</span><span class="chip chip-cyan"><span>${esc(p.event)}</span></span></div>` : "";
     el.innerHTML = `
-      <div class="print-photo">
+      <div class="print-photo">${when}
         <img src="${esc(p.src || placeholderFor(p.id))}" alt="${p.src ? `3D print${p.printer ? ` by ${esc(p.printer)}` : ""}` : "no image for this print"}" loading="lazy" decoding="async" draggable="false">
       </div>
       <div class="print-caption"><span>printed by</span>
