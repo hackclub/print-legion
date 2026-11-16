@@ -8,8 +8,8 @@ class PrinterAccount
   P = AirtableConfig::PRINTERS
   R = AirtableConfig::PRINTS
 
-  Account = Struct.new(:id, :name, :avatar, :email, :hcb_email, :country, :active,
-                       :total_grams, :print_ids, keyword_init: true)
+  Account = Struct.new(:id, :name, :avatar, :email, :country, :active,
+                       :total_grams, :print_ids, :grant_ids, keyword_init: true)
   Invalid = Class.new(StandardError) # message is safe to show the printer
 
   NAME_MAX = 40
@@ -37,8 +37,7 @@ class PrinterAccount
     # ---- reading ---------------------------------------------------------------
 
     def load(id)
-      fields = P.values_at(:display_name, :profile_picture, :email, :country, :active, :total_grams, :prints)
-      fields << P[:hcb_email] if P[:hcb_email]
+      fields = P.values_at(:display_name, :profile_picture, :email, :country, :active, :total_grams, :prints, :grants)
       rec = client.find(P[:table], id, fields:)
       f = rec["fields"]
       avatar = Array(f[P[:profile_picture]]).last
@@ -47,12 +46,12 @@ class PrinterAccount
         name: f[P[:display_name]].to_s.strip.presence || "printer",
         avatar: avatar&.dig("thumbnails", "large", "url") || avatar&.dig("url"),
         email: f[P[:email]].presence,
-        hcb_email: (P[:hcb_email] && f[P[:hcb_email]].presence) || f[P[:email]].presence,
         country: f[P[:country]].presence,
         active: !!f[P[:active]],
         total_grams: f[P[:total_grams]].to_f,
         # Only plain IDs reach the formula below (letters and digits, nothing to escape).
-        print_ids: Array(f[P[:prints]]).grep(/\Arec[A-Za-z0-9]{1,30}\z/)
+        print_ids: Array(f[P[:prints]]).grep(/\Arec[A-Za-z0-9]{1,30}\z/),
+        grant_ids: Array(f[P[:grants]]).grep(/\Arec[A-Za-z0-9]{1,30}\z/)
       )
     end
 
@@ -117,15 +116,19 @@ class PrinterAccount
       expire_public_profiles
     end
 
-    def hcb_email_editable? = P[:hcb_email].present?
-
-    def update_hcb_email(id, raw)
-      raise Invalid, "HCB email editing isn't switched on yet." unless hcb_email_editable?
+    # The printer's email, which is also their HCB email (grants go there).
+    # Two printers can't share one: it's also how sign-in finds someone with
+    # no Slack ID on their Hack Club account.
+    def update_email(id, raw)
       email = raw.to_s.strip.downcase
       unless email.length <= EMAIL_MAX && email.match?(URI::MailTo::EMAIL_REGEXP)
         raise Invalid, "That doesn't look like an email address."
       end
-      client.update(P[:table], id, P[:hcb_email] => email)
+      owner = by_email(email)
+      return email if owner == id # already theirs
+      raise Invalid, "Another printer already uses that email." if owner
+
+      client.update(P[:table], id, P[:email] => email)
       email
     end
 

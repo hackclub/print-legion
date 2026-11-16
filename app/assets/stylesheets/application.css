@@ -522,11 +522,10 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .dash-hcb-form .dash-field { flex: 1; }
 .dash-hcb-form .dash-save { align-self: auto; height: 38px; }
 .dash-grant {
-  display: grid; grid-template-columns: 110px minmax(0, 1fr) auto auto; align-items: center; gap: 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 14px;
   padding: 12px 14px;
   background: var(--light-200); border: 1px solid var(--light-300); border-radius: 7px;
 }
-.dash-grant-amount { font-family: var(--display); font-size: 24px; line-height: 1; }
 .dash-grant-purpose { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .notice-card {
@@ -554,7 +553,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   .dash-print-title { white-space: normal; }
   .dash-hcb-form { flex-basis: 100%; max-width: none; }
   .dash-grant { grid-template-columns: minmax(0, 1fr) auto; }
-  .dash-grant-purpose, .dash-grant .dash-print-meta { grid-column: 1 / -1; }
+  .dash-grant .dash-print-meta { grid-column: 1; grid-row: 2; }
 }
 
 /* ---------- loading screen ---------- */

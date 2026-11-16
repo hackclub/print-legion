@@ -3,7 +3,7 @@
 class DashboardController < ApplicationController
   before_action :require_printer!
   before_action { response.headers["Cache-Control"] = "no-store" }
-  rate_limit to: 10, within: 1.minute, only: %i[update_profile update_hcb_email],
+  rate_limit to: 10, within: 1.minute, only: %i[update_profile update_email],
              with: -> { redirect_to dashboard_path, alert: "Slow down a little, then try again." }
 
   rescue_from AirtableClient::Error, with: :airtable_down
@@ -16,7 +16,12 @@ class DashboardController < ApplicationController
   def stats
     @account = PrinterAccount.load(current_printer_id)
     @prints = PrinterAccount.prints(@account)
-    @grants = GrantLedger.for_email(@account.hcb_email)
+    @grants = begin
+      GrantLedger.for_account(@account)
+    rescue AirtableClient::Error => e # grants are extra: keep the rest of the page
+      Rails.logger.warn("Grants: #{e.message}")
+      nil
+    end
     @rank = rank_for(@account.id)
   end
 
@@ -36,9 +41,9 @@ class DashboardController < ApplicationController
     redirect_to dashboard_path, alert: e.message
   end
 
-  def update_hcb_email
-    email = PrinterAccount.update_hcb_email(current_printer_id, params[:hcb_email])
-    redirect_to dashboard_stats_path(anchor: "grants"), notice: "HCB email set to #{email}."
+  def update_email
+    email = PrinterAccount.update_email(current_printer_id, params[:email])
+    redirect_to dashboard_stats_path(anchor: "grants"), notice: "Email set to #{email}."
   rescue PrinterAccount::Invalid => e
     redirect_to dashboard_stats_path(anchor: "grants"), alert: e.message
   end
@@ -54,7 +59,8 @@ class DashboardController < ApplicationController
   end
 
   def sent_print_form_url
-    url = ENV["SENT_PRINT_FORM_URL"].to_s.strip
+    url = ENV["SENT_PRINT_FORM_URL"].presence || "https://forms.hackclub.com/sent-print"
+    url = url.strip
     url.match?(%r{\Ahttps://\S+\z}) ? url : nil
   end
 

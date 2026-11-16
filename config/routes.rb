@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#show"
   get "dashboard/stats", to: "dashboard#stats", as: :dashboard_stats
   patch "dashboard/profile", to: "dashboard#update_profile", as: :dashboard_profile
-  patch "dashboard/hcb-email", to: "dashboard#update_hcb_email", as: :dashboard_hcb_email
+  patch "dashboard/email", to: "dashboard#update_email", as: :dashboard_email
 
   namespace :api do
     get "live", to: "live#show"     # stats (+ optional recent prints)

@@ -61,47 +61,37 @@
 <section class="dash-section" id="grants">
   <div class="dash-section-head">
     <h2 class="dash-heading">grants</h2>
-    <% if @grants.status == :ok && @grants.grants.any? %>
-      <span class="pill pill-orange"><%= number_to_currency(@grants.total) %> total</span>
-    <% end %>
+    <% if @grants&.any? %><span class="pill pill-orange"><%= pluralize(@grants.size, "card") %></span><% end %>
   </div>
 
   <div class="dash-card dash-hcb">
     <div>
-      <span class="control-label">HCB email</span>
-      <p class="dash-hcb-email"><%= @account.hcb_email || "not set" %></p>
+      <span class="control-label">email (and HCB email)</span>
+      <p class="dash-hcb-email"><%= @account.email || "not set" %></p>
       <p class="dash-hint">Grants are sent to this address on HCB.</p>
     </div>
-    <% if PrinterAccount.hcb_email_editable? %>
-      <%= form_with url: dashboard_hcb_email_path, method: :patch, class: "dash-hcb-form" do |f| %>
-        <label class="dash-field">
-          <span class="control-label">change it</span>
-          <%= f.email_field :hcb_email, value: @account.hcb_email, required: true, maxlength: PrinterAccount::EMAIL_MAX, autocomplete: "email", class: "dash-input" %>
-        </label>
-        <%= f.submit "update", class: "cta cta-cyan dash-save" %>
-      <% end %>
+    <%= form_with url: dashboard_email_path, method: :patch, class: "dash-hcb-form" do |f| %>
+      <label class="dash-field">
+        <span class="control-label">change it</span>
+        <%= f.email_field :email, value: @account.email, required: true, maxlength: PrinterAccount::EMAIL_MAX, autocomplete: "email", class: "dash-input" %>
+      </label>
+      <%= f.submit "update", class: "cta cta-cyan dash-save" %>
     <% end %>
   </div>
 
-  <% case @grants.status %>
-  <% when :not_configured %>
-    <p class="dash-empty">Grant history is on its way. Grants sent to your HCB email will show up here.</p>
-  <% when :error %>
+  <% if @grants.nil? %>
     <p class="dash-empty">Couldn't load your grants right now. Try again in a minute.</p>
+  <% elsif @grants.empty? %>
+    <p class="dash-empty">No grants issued to you yet.</p>
   <% else %>
-    <% if @grants.grants.empty? %>
-      <p class="dash-empty">No grants to <%= @account.hcb_email %> yet.</p>
-    <% else %>
-      <ol class="dash-grants">
-        <% @grants.grants.each do |g| %>
-          <li class="dash-grant">
-            <span class="dash-grant-amount"><%= number_to_currency(g[:amount]) %></span>
-            <span class="dash-grant-purpose"><%= g[:purpose] || "grant" %></span>
-            <span class="dash-print-meta"><%= g[:date]&.strftime("%-d %b %Y") %></span>
-            <% if g[:link] %><a class="pill pill-cyan" href="<%= g[:link] %>" target="_blank" rel="noopener">open on HCB</a><% end %>
-          </li>
-        <% end %>
-      </ol>
-    <% end %>
+    <ol class="dash-grants">
+      <% @grants.each do |g| %>
+        <li class="dash-grant">
+          <span class="dash-grant-purpose"><%= g[:purpose] || "grant card" %></span>
+          <span class="dash-print-meta"><%= g[:issued] ? "issued #{g[:issued].strftime("%-d %b %Y")}" : "" %></span>
+          <% if g[:url] %><a class="pill pill-cyan" href="<%= g[:url] %>" target="_blank" rel="noopener">open card</a><% end %>
+        </li>
+      <% end %>
+    </ol>
   <% end %>
 </section>
