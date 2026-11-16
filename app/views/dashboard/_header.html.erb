@@ -2,8 +2,9 @@
 <div class="title-row">
   <h1 class="page-title"><%= title %></h1>
   <nav class="dash-tabs" aria-label="dashboard">
-    <a class="docs-tab<%= " is-active" if active == :profile %>" href="<%= dashboard_path %>"<%= ' aria-current="page"'.html_safe if active == :profile %>>profile</a>
-    <a class="docs-tab<%= " is-active" if active == :stats %>" href="<%= dashboard_stats_path %>"<%= ' aria-current="page"'.html_safe if active == :stats %>>stats</a>
+    <% { profile: dashboard_path, stats: dashboard_stats_path, grants: dashboard_grants_path }.each do |tab, path| %>
+      <a class="docs-tab<%= " is-active" if active == tab %>" href="<%= path %>"<%= ' aria-current="page"'.html_safe if active == tab %>><%= tab %></a>
+    <% end %>
     <%= button_to "sign out", logout_path, method: :delete, class: "docs-tab", form_class: "dash-signout" %>
   </nav>
 </div>

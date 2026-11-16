@@ -462,6 +462,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
   border: 1px solid var(--light-300); border-radius: 7px;
 }
 .dash-heading { font-size: 24px; font-weight: 700; font-style: italic; line-height: 29px; }
+.dash-grants-page { margin-top: 40px; }
 .dash-text { font-size: 15px; line-height: 1.45; }
 .dash-hint { font-size: 12px; font-weight: 500; color: var(--dark-100); }
 .dash-cta { align-self: flex-start; margin: 8px 0 0 21px; }

@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   get "dashboard", to: "dashboard#show"
   get "dashboard/stats", to: "dashboard#stats", as: :dashboard_stats
+  get "dashboard/grants", to: "dashboard#grants", as: :dashboard_grants
   patch "dashboard/profile", to: "dashboard#update_profile", as: :dashboard_profile
   patch "dashboard/email", to: "dashboard#update_email", as: :dashboard_email
 

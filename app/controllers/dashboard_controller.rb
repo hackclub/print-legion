@@ -24,13 +24,17 @@ class DashboardController < ApplicationController
     @account = PrinterAccount.load(current_printer_id)
     @prints = PrinterAccount.prints(@account)
     @recipients = SlackDirectory.people(@prints.filter_map { _1[:recipient] })
+    @rank = rank_for(@account.id)
+  end
+
+  def grants
+    @account = PrinterAccount.load(current_printer_id)
     @grants = begin
       GrantLedger.for_account(@account)
-    rescue AirtableClient::Error => e # grants are extra: keep the rest of the page
+    rescue AirtableClient::Error => e # keep the email form usable
       Rails.logger.warn("Grants: #{e.message}")
       nil
     end
-    @rank = rank_for(@account.id)
   end
 
   def update_profile
@@ -59,9 +63,9 @@ class DashboardController < ApplicationController
 
   def update_email
     email = PrinterAccount.update_email(current_printer_id, params[:email])
-    redirect_to dashboard_stats_path(anchor: "grants"), notice: "Email set to #{email}."
+    redirect_to dashboard_grants_path, notice: "Email set to #{email}."
   rescue PrinterAccount::Invalid => e
-    redirect_to dashboard_stats_path(anchor: "grants"), alert: e.message
+    redirect_to dashboard_grants_path, alert: e.message
   end
 
   private
