@@ -1,0 +1,5 @@
+<% content_for :title, "sign in · print legion" %>
+<%= render "shared/back" %>
+<%= render "sessions/notice", title: "sign-in isn't set up yet", body: "The printer dashboard is almost ready. Check back soon!" do %>
+  <a class="cta cta-cyan" href="<%= printers_path %>">see the printers</a>
+<% end %>

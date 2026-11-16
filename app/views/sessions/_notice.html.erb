@@ -1,0 +1,7 @@
+<%# A simple centred message card for sign-in outcomes. %>
+<section class="notice-card">
+  <%= image_tag local_assigns[:icon] || "calicat.png", alt: "", class: "notice-icon" %>
+  <h1 class="notice-title"><%= title %></h1>
+  <p class="notice-body"><%= body %></p>
+  <div class="notice-actions"><%= yield %></div>
+</section>

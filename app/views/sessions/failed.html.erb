@@ -1,0 +1,5 @@
+<% content_for :title, "sign in · print legion" %>
+<%= render "shared/back" %>
+<%= render "sessions/notice", title: "hmm, that didn't work", body: @message do %>
+  <a class="cta cta-cyan" href="<%= login_path %>">try again</a>
+<% end %>
