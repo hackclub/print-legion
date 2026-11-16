@@ -48,10 +48,12 @@ class SessionsController < ApplicationController
     redirect_to root_path
   end
 
-  # Development only (the route doesn't exist elsewhere): sign in as any
-  # printer record without Hack Club Auth, to work on the dashboard offline.
+  # Development only (the route doesn't exist elsewhere), and only from this
+  # machine: sign in as any printer record without Hack Club Auth, to work on
+  # the dashboard offline. A dev server that's reachable from outside still
+  # can't be used to sign in as someone.
   def dev
-    raise ActionController::RoutingError, "Not Found" unless Rails.env.development?
+    raise ActionController::RoutingError, "Not Found" unless Rails.env.development? && request.local?
     PrinterAccount.load(params[:id]) # must be a real printer record
     sign_in!(params[:id])
     redirect_to dashboard_path

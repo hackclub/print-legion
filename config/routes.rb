@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   get "login", to: "sessions#new"
   get "oauth/callback", to: "sessions#callback"
   delete "logout", to: "sessions#destroy"
-  get "dev/login/:id", to: "sessions#dev", as: :dev_login if Rails.env.development?
+  get "dev/login/:id", to: "sessions#dev", as: :dev_login, constraints: ->(req) { req.local? } if Rails.env.development?
 
   get "dashboard", to: "dashboard#show"
   get "dashboard/stats", to: "dashboard#stats", as: :dashboard_stats
