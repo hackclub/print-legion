@@ -56,6 +56,12 @@ class PrinterDirectory
       end
     end
 
+    # "Korea, South" -> "South Korea"; blank -> nil.
+    def normalize_country(raw)
+      c = Array(raw).first.to_s.strip
+      c.empty? ? nil : COUNTRY_ALIASES.fetch(c.downcase, c)
+    end
+
     # Both live calls at once: one round trip for the browser, ~one for us.
     def live(prints_limit: nil)
       jobs = [-> { stats }]
@@ -119,10 +125,7 @@ class PrinterDirectory
 
     # Distinct, trimmed country names across all prints. Blank cells are skipped.
     def count_countries(rows)
-      rows.flat_map { Array(_1["fields"]&.dig(R[:sent_to_country])) }
-          .map { _1.to_s.strip }.reject(&:empty?)
-          .map { |c| COUNTRY_ALIASES.fetch(c.downcase, c) }
-          .uniq(&:downcase).size
+      rows.filter_map { normalize_country(_1["fields"]&.dig(R[:sent_to_country])) }.uniq(&:downcase).size
     end
 
     def fetch_prints(limit, offset, photos_only)
