@@ -1,6 +1,6 @@
 <% content_for :title, "sign in · print legion" %>
 <%= render "shared/back" %>
 <%= render "sessions/notice", icon: "guyblue.png", title: "you're not a printer (yet!)",
-      body: "We couldn't find a printer with your Hack Club account. If you signed up with a different Slack account or email, ask in #printing-legion." do %>
+      body: "We couldn't find a printer with your Hack Club account. If you signed up with a different Slack account, sign in with the Hack Club account linked to that one, or ask in #printing-legion." do %>
   <a class="cta cta-orange" href="<%= doc_path("printers") %>">become a printer</a>
 <% end %>

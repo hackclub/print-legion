@@ -29,10 +29,10 @@ class PrinterAccount
 
     # ---- sign-in -------------------------------------------------------------
 
-    # Hack Club Auth identity -> printer record ID (or nil). Slack ID first;
-    # the account email only when there's no Slack ID match.
+    # Hack Club Auth identity -> printer record ID (or nil), by Slack ID only.
+    # Emails are editable by printers, so they're never used to sign anyone in.
     def record_id_for(identity)
-      by_slack(identity.slack_id) || by_email(identity.email)
+      by_slack(identity.slack_id)
     end
 
     # ---- reading ---------------------------------------------------------------
@@ -144,8 +144,8 @@ class PrinterAccount
     end
 
     # The printer's email, which is also their HCB email (grants go there).
-    # Two printers can't share one: it's also how sign-in finds someone with
-    # no Slack ID on their Hack Club account.
+    # Two printers can't share one, so grants can't be pointed at someone else's
+    # address by mistake.
     def update_email(id, raw)
       email = raw.to_s.strip.downcase
       unless email.length <= EMAIL_MAX && email.match?(URI::MailTo::EMAIL_REGEXP)

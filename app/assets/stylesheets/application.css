@@ -587,7 +587,7 @@ body[data-live="home"] .main { justify-content: space-evenly; }
 .notice-icon { width: 72px; height: 72px; }
 .notice-title { font-size: 30px; font-weight: 700; font-style: italic; line-height: 1.2; }
 .notice-body { font-size: 16px; line-height: 1.5; }
-.notice-actions { margin-top: 10px; padding-left: 21px; }
+.notice-actions { margin-top: 10px; padding-left: 21px; display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
 
 @media (max-width: 960px) {
   .dash { grid-template-columns: minmax(0, 1fr); }

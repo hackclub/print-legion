@@ -1,0 +1,7 @@
+<% content_for :title, "sign in · print legion" %>
+<%= render "shared/back" %>
+<%= render "sessions/notice", icon: "guyred.png", title: "link Slack first",
+      body: "Printers sign in with their Slack account, and your Hack Club account doesn't have Slack linked. Link Slack on Hack Club Auth, or sign in with the Hack Club account that has your Slack." do %>
+  <a class="cta cta-cyan" href="<%= HackClubAuthConfig::HOST %>" target="_blank" rel="noopener">open Hack Club Auth</a>
+  <a class="cta cta-orange" href="<%= login_path %>">try again</a>
+<% end %>

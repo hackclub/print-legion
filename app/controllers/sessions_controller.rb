@@ -27,6 +27,10 @@ class SessionsController < ApplicationController
     return failed("Hack Club Auth didn't send a sign-in code.") unless code.is_a?(String) && code.length.between?(1, 512)
 
     identity = HackClubAuth.identify(code:, redirect_uri:)
+    unless identity.slack_id
+      reset_session
+      return render :no_slack, status: :forbidden
+    end
     if (printer_id = PrinterAccount.record_id_for(identity))
       sign_in!(printer_id, hca_id: identity.id)
       redirect_to dashboard_path
