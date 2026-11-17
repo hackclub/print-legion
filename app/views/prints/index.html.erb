@@ -3,5 +3,5 @@
 <%= render "shared/back" %>
 <div class="title-row"><h1 class="page-title">prints</h1></div>
 <div class="print-grid" id="print-grid"
-     data-placeholders="<%= %w[no-image-cube.png no-image-cat.png no-image-benchy.png].map { image_path(_1) }.join(" ") %>"></div>
+     data-placeholders="<%= ApplicationHelper::PRINT_PLACEHOLDERS.map { image_path(_1) }.join(" ") %>"></div>
 <div class="feed-end" id="feed-end" aria-hidden="true"></div>

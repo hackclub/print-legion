@@ -92,7 +92,7 @@
           <% if p[:image] %>
             <img class="dash-thumb" src="<%= p[:image] %>" alt="" loading="lazy">
           <% else %>
-            <%= image_tag "no-image-cube.png", alt: "", class: "dash-thumb is-placeholder", loading: "lazy" %>
+            <%= image_tag print_placeholder(p[:id]), alt: "", class: "dash-thumb is-placeholder", loading: "lazy" %>
           <% end %>
           <div class="dash-print-main">
             <div class="dash-print-title">

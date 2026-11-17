@@ -34,4 +34,13 @@ module ApplicationHelper
   end
 
   SLACK_CHANNEL = "https://hackclub.slack.com/archives/C083P4FJM46".freeze
+
+  # The three "no image for print!" cards. A print keeps the same one
+  # everywhere: this matches placeholderFor() in app.js.
+  PRINT_PLACEHOLDERS = %w[no-image-cube.png no-image-cat.png no-image-benchy.png].freeze
+
+  def print_placeholder(id)
+    h = id.to_s.each_char.reduce(0) { |acc, c| (acc * 31 + c.ord) & 0xFFFFFFFF }
+    PRINT_PLACEHOLDERS[h % PRINT_PLACEHOLDERS.size]
+  end
 end
