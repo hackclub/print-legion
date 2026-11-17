@@ -5,6 +5,17 @@
 <%= render "dashboard/header", title: "your grants", active: :grants %>
 
 <section class="dash-section dash-grants-page">
+  <%# Temporary: links out to the Fillout form until requests move into the dashboard. %>
+  <div class="dash-card dash-request">
+    <div>
+      <h2 class="dash-heading">need a shipping grant?</h2>
+      <p class="dash-text">Request one to cover the cost of sending out prints.</p>
+    </div>
+    <a class="cta cta-orange dash-cta" href="https://forms.hackclub.com/printing-legion-active-grants" target="_blank" rel="noopener">
+      <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>request a shipping grant
+    </a>
+  </div>
+
   <div class="dash-card dash-hcb">
     <div>
       <span class="control-label">email (and HCB email)</span>

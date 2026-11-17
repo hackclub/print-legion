@@ -1271,6 +1271,17 @@ body[data-live="home"] .main {
 .dash-grants-page {
     margin-top: 40px;
 }
+.dash-request {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+}
+.dash-request .dash-cta {
+    align-self: center;
+    margin: 0 0 0 21px;
+}
 .dash-text {
     font-size: 15px;
     line-height: 1.45;
