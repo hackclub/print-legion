@@ -1282,6 +1282,111 @@ body[data-live="home"] .main {
     align-self: center;
     margin: 0 0 0 21px;
 }
+
+/* ---------- sent-print form (/dashboard/send) ---------- */
+
+.send-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 640px;
+    margin-top: 24px;
+    font-size: 15px;
+    line-height: 1.45;
+}
+.send-intro ul {
+    padding-left: 22px;
+}
+.send-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 720px;
+    margin-top: 28px;
+}
+.send-section {
+    gap: 18px;
+}
+.send-readonly {
+    font-size: 15px;
+}
+.send-readonly .dash-mono {
+    font-size: 14px;
+    padding: 4px 8px;
+}
+.send-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+}
+.send-short {
+    max-width: 180px;
+}
+.send-select {
+    appearance: auto;
+    cursor: pointer;
+}
+.send-file {
+    padding: 10px;
+    border: 1px dashed var(--light-400);
+    border-radius: 7px;
+    background: var(--light-100);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+.send-file:hover {
+    border-color: var(--dark-100);
+}
+.dash-input.is-invalid,
+.send-file.is-invalid {
+    border-color: var(--red-100);
+}
+.send-error {
+    color: var(--red-100);
+    font-size: 13px;
+    font-weight: 600;
+}
+.send-recipient {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    background: var(--light-100);
+    border: 1px solid var(--light-300);
+    font-size: 14px;
+}
+.send-recipient .dash-recipient-avatar {
+    width: 26px;
+    height: 26px;
+}
+.send-recipient-wait,
+.send-recipient-miss {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--dark-100);
+}
+.send-recipient-miss {
+    color: var(--red-100);
+}
+.send-alt {
+    padding: 14px;
+    border-radius: 7px;
+    border: 1px solid var(--orange-100);
+    background: var(--light-100);
+}
+.send-actions {
+    padding-left: 21px;
+    padding-bottom: 12px;
+}
+.send-submit {
+    font-size: 22px;
+    padding: 8px 28px;
+}
+.send-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 .dash-text {
     font-size: 15px;
     line-height: 1.45;

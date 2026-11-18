@@ -414,6 +414,73 @@
     render();
   }
 
+  // ---------- dashboard: the sent-print form ----------
+  function sendForm() {
+    const form = $("[data-send-form]");
+    if (!form) return;
+
+    // Recipient preview: Slack display name + avatar once the ID looks right.
+    const input = $("[data-recipient-input]", form);
+    const box = $("[data-recipient-preview]", form);
+    let timer, last = "";
+    const show = (html) => { box.innerHTML = html; box.hidden = !html; };
+    const lookup = async () => {
+      const id = input.value.trim().toUpperCase();
+      if (id === last) return;
+      last = id;
+      if (!/^[UW][A-Z0-9]{8,10}$/.test(id)) return show("");
+      show(`<span class="send-recipient-wait">looking them up…</span>`);
+      try {
+        const res = await fetch(`${input.dataset.previewUrl}?slack_id=${encodeURIComponent(id)}`, { headers: { Accept: "application/json" } });
+        if (id !== input.value.trim().toUpperCase()) return; // typed on meanwhile
+        const who = res.ok ? await res.json() : { found: false };
+        if (!who.found) return show(`<span class="send-recipient-miss">No Slack user with that ID. Double-check it?</span>`);
+        const pic = who.avatar
+          ? `<img class="dash-recipient-avatar" src="${esc(who.avatar)}" alt="" referrerpolicy="no-referrer">`
+          : `<span class="dash-recipient-avatar is-blank">${esc(who.name.charAt(0).toUpperCase())}</span>`;
+        show(`${pic}<span class="dash-recipient-name">${esc(who.name)}</span><span class="dash-mono">(${esc(who.id)})</span>`);
+      } catch (_) {
+        show("");
+      }
+    };
+    input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(lookup, 350); });
+    lookup();
+
+    // Files over 5 MB can't be uploaded: drop them from the picker and, for
+    // photos and STLs, ask where they are instead.
+    const alt = $("[data-alt-field]", form);
+    const altInput = $("input", alt);
+    const altReason = $("[data-alt-reason]", alt);
+    const tooBig = {};
+    $$("input[type=file][data-max-bytes]", form).forEach((picker) => {
+      const note = document.createElement("p");
+      note.className = "send-error";
+      note.hidden = true;
+      picker.after(note);
+      picker.addEventListener("change", () => {
+        const max = Number(picker.dataset.maxBytes);
+        const keep = new DataTransfer();
+        const big = [];
+        [...picker.files].forEach((f) => (f.size > max ? big.push(f.name) : keep.items.add(f)));
+        if (big.length) picker.files = keep.files;
+        tooBig[picker.dataset.kind] = picker.dataset.kind === "proof" ? [] : big;
+        note.hidden = !big.length;
+        note.textContent = picker.dataset.kind === "proof"
+          ? `${big.join(", ")} ${big.length === 1 ? "is" : "are"} over 5 MB. Upload a smaller copy (a screenshot works).`
+          : `${big.join(", ")} ${big.length === 1 ? "is" : "are"} over 5 MB, so ${big.length === 1 ? "it" : "they"} won't be uploaded. Link ${big.length === 1 ? "it" : "them"} below instead.`;
+        const all = [...(tooBig.images || []), ...(tooBig.stls || [])];
+        if (all.length) {
+          alt.hidden = false;
+          altInput.required = true;
+          altReason.textContent = `${all.join(", ")} ${all.length === 1 ? "is" : "are"} over 5 MB. Put ${all.length === 1 ? "it" : "them"} somewhere online (a GitHub folder works) and paste the link.`;
+        } else if (!altInput.value) {
+          alt.hidden = true;
+          altInput.required = false;
+        }
+      });
+    });
+  }
+
   // ---------- dashboard ----------
   function dashboard() {
     done();
@@ -449,9 +516,10 @@
     });
     printFilters();
     grantFilter();
+    sendForm();
 
     // One click, one save: grey the button out while the form is sent.
-    $$("form.dash-form, form.dash-hcb-form").forEach((form) => {
+    $$("form.dash-form, form.dash-hcb-form, form.send-form").forEach((form) => {
       form.addEventListener("submit", () => {
         const btn = $("[type=submit]", form);
         if (!btn) return;

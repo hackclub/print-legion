@@ -10,7 +10,6 @@ class DashboardController < ApplicationController
 
   def show
     @account = PrinterAccount.load(current_printer_id)
-    @form_url = sent_print_form_url
     @eligibility = Eligibility.for(@account, hca_id: session[:hca_id])
     # A failing check switches the printer off (and keeps them off: see update_profile).
     if @eligibility.locked? && @account.active
@@ -76,12 +75,6 @@ class DashboardController < ApplicationController
     table = PrinterDirectory.stats["printers"]
     order = table.select { |_, s| s["prints"].positive? }.sort_by { |_, s| [-s["prints"], -s["grams"]] }.map(&:first)
     (i = order.index(id)) && { place: i + 1, of: order.size }
-  end
-
-  def sent_print_form_url
-    url = ENV["SENT_PRINT_FORM_URL"].presence || "https://forms.hackclub.com/sent-print"
-    url = url.strip
-    url.match?(%r{\Ahttps://\S+\z}) ? url : nil
   end
 
   def airtable_down(error)

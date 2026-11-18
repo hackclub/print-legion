@@ -15,12 +15,10 @@
         <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>log a sent print
       </span>
       <p class="dash-hint">Locked until your eligibility checks pass (see below).</p>
-    <% elsif @form_url %>
-      <a class="cta cta-orange dash-cta" href="<%= @form_url %>" target="_blank" rel="noopener">
+    <% else %>
+      <a class="cta cta-orange dash-cta" href="<%= dashboard_send_path %>">
         <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>log a sent print
       </a>
-    <% else %>
-      <p class="dash-hint">The sent-print form link is coming soon.</p>
     <% end %>
   </section>
 

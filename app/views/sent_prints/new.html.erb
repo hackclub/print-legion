@@ -1,0 +1,163 @@
+<% content_for :title, "log a sent print · print legion" %>
+<% content_for :live, "dashboard" %>
+<% content_for :favicon, "guyblue.png" %>
+<% content_for :logo, "guyblue.png guyred.png guygreen.png" %>
+<%= render "dashboard/header", title: "log a sent print", active: nil %>
+<%
+  v = @form.values
+  err = ->(key) { (msg = @form.errors[key]) ? tag.p(msg, class: "send-error", id: "#{key}-error") : "" }
+  bad = ->(key) { @form.errors[key] ? " is-invalid" : "" }
+  link_label = ->(url) { url.to_s.sub(%r{\Ahttps://}, "") }
+%>
+
+<div class="send-intro">
+  <p>Fill this out once you've finished a print job. Make sure you've:</p>
+  <ul>
+    <li>printed all the parts requested</li>
+    <li>shipped it out to the recipient</li>
+  </ul>
+  <p><b>One form per request, not several at once. Don't fill it out until the print is shipped.</b></p>
+</div>
+
+<%= form_with url: dashboard_send_path, method: :post, scope: :print, multipart: true, class: "send-form", data: { send_form: true } do |f| %>
+  <%= hidden_field_tag :send_token, @send_token %>
+
+  <section class="dash-card send-section">
+    <h2 class="dash-heading">your details</h2>
+
+    <div class="dash-field">
+      <span class="control-label">your Slack ID</span>
+      <p class="send-readonly"><span class="dash-mono"><%= @account.slack_id %></span></p>
+      <span class="dash-hint">Filled in from your sign-in. Incorrect? DM @nimit to get it fixed :)</span>
+    </div>
+
+    <label class="dash-field">
+      <span class="control-label">HCB shipping card</span>
+      <span class="dash-hint">The card you paid for the label with. Haven't paid for the label yet? Fill this out after you do.</span>
+      <% if @grants.any? { _1[:url] } %>
+        <%= f.select :shipping_grant,
+              @grants.select { _1[:url] }.map { |g| ["#{g[:purpose] || "grant card"}#{g[:amount] ? " · #{number_to_currency(g[:amount], precision: (g[:amount] % 1).zero? ? 0 : 2)}" : ""} · #{link_label.(g[:url])}", g[:url]] },
+              { include_blank: "pick a card…", selected: v[:shipping_grant] },
+              { required: true, class: "dash-input send-select#{bad.(:shipping_grant)}" } %>
+      <% else %>
+        <p class="send-error">You don't have a grant card yet. <a class="u" href="<%= dashboard_grants_path %>">Request a shipping grant</a> first.</p>
+      <% end %>
+      <%= err.(:shipping_grant) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">#printing-legion message URL</span>
+      <span class="dash-hint">The link to <b>your</b> message posting the prints, not the request post.</span>
+      <%= f.url_field :message_url, value: v[:message_url], required: true, placeholder: "https://hackclub.slack.com/archives/C083P4FJM46/p1750383693439…", class: "dash-input#{bad.(:message_url)}" %>
+      <%= err.(:message_url) %>
+    </label>
+  </section>
+
+  <section class="dash-card send-section">
+    <h2 class="dash-heading">recipient details</h2>
+
+    <label class="dash-field">
+      <span class="control-label">Slack ID of who you printed for</span>
+      <%= f.text_field :recipient, value: v[:recipient], required: true, placeholder: "U06PR6B8D37", autocomplete: "off", spellcheck: false,
+            maxlength: 11, pattern: "[UWuw][A-Za-z0-9]{8,10}", class: "dash-input send-mono#{bad.(:recipient)}",
+            data: { recipient_input: true, preview_url: dashboard_send_recipient_path } %>
+      <span class="send-recipient" data-recipient-preview hidden></span>
+      <%= err.(:recipient) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">GitHub URL of the project you printed</span>
+      <%= f.url_field :github_url, value: v[:github_url], required: true, placeholder: "https://github.com/hackclub/print-legion", class: "dash-input#{bad.(:github_url)}" %>
+      <%= err.(:github_url) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">HCB grant card (recipient)</span>
+      <span class="dash-hint">The recipient's card. It must be issued by the YSWS.</span>
+      <%= f.url_field :recipient_grant, value: v[:recipient_grant], required: true, placeholder: "https://hcb.hackclub.com/grants/12AB3C", class: "dash-input#{bad.(:recipient_grant)}" %>
+      <%= err.(:recipient_grant) %>
+    </label>
+  </section>
+
+  <section class="dash-card send-section">
+    <h2 class="dash-heading">shipping details</h2>
+
+    <label class="dash-field">
+      <span class="control-label">tracking number</span>
+      <span class="dash-hint">Only the tracking number(s), no links. Several shipments: separate them with commas. Met in person? Write "N/A, delivered in-person".</span>
+      <%= f.text_field :tracking, value: v[:tracking], required: true, maxlength: 200, placeholder: "SHIP0001, SHIP0002", class: "dash-input#{bad.(:tracking)}" %>
+      <%= err.(:tracking) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">shipping cost (USD)</span>
+      <%= f.text_field :shipping_cost, value: v[:shipping_cost], required: true, inputmode: "decimal", pattern: "\\d{1,4}(\\.\\d{1,2})?", placeholder: "0.67", class: "dash-input send-short#{bad.(:shipping_cost)}" %>
+      <%= err.(:shipping_cost) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">shipping cost proof</span>
+      <span class="dash-hint">A receipt or confirmation showing the exact price of the label. PNG, JPG or PDF, up to 5 MB.</span>
+      <%= f.file_field :proof, multiple: true, required: true, accept: SentPrint::PROOF_TYPES.keys.map { ".#{_1}" }.join(","), class: "send-file#{bad.(:proof)}", data: { max_bytes: SentPrint::MAX_FILE, kind: "proof" } %>
+      <%= err.(:proof) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">destination country</span>
+      <%= f.select :country, @choices[:countries], { include_blank: "pick a country…", selected: v[:country] }, { required: true, class: "dash-input send-select#{bad.(:country)}" } %>
+      <%= err.(:country) %>
+    </label>
+  </section>
+
+  <section class="dash-card send-section">
+    <h2 class="dash-heading">print details</h2>
+
+    <label class="dash-field">
+      <span class="control-label">total weight (g)</span>
+      <%= f.text_field :weight, value: v[:weight], required: true, inputmode: "decimal", pattern: "\\d{1,6}(\\.\\d{1,2})?", placeholder: "67", class: "dash-input send-short#{bad.(:weight)}" %>
+      <%= err.(:weight) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">which YSWS is this print for?</span>
+      <span class="dash-hint">Shipping parts for more than one program? Fill this out separately for each.</span>
+      <%= f.select :program, @choices[:programs], { include_blank: "pick a YSWS…", selected: v[:program] }, { required: true, class: "dash-input send-select#{bad.(:program)}" } %>
+      <%= err.(:program) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">photo of the print</span>
+      <span class="dash-hint">PNG, JPG, GIF or WebP, up to 5 MB each.</span>
+      <%= f.file_field :images, multiple: true, accept: SentPrint::IMAGE_TYPES.keys.map { ".#{_1}" }.join(","), class: "send-file#{bad.(:images)}", data: { max_bytes: SentPrint::MAX_FILE, kind: "images" } %>
+      <%= err.(:images) %>
+    </label>
+
+    <label class="dash-field">
+      <span class="control-label">STL file(s) you printed</span>
+      <span class="dash-hint">STL, 3MF, STEP, OBJ or ZIP, up to 5 MB each.</span>
+      <%= f.file_field :stls, multiple: true, accept: SentPrint::MODEL_TYPES.keys.map { ".#{_1}" }.join(","), class: "send-file#{bad.(:stls)}", data: { max_bytes: SentPrint::MAX_FILE, kind: "stls" } %>
+      <%= err.(:stls) %>
+    </label>
+
+    <label class="dash-field send-alt" data-alt-field <%= "hidden" unless v[:files_location].present? || @form.errors[:files_location] %>>
+      <span class="control-label">where are the bigger files?</span>
+      <span class="dash-hint" data-alt-reason>Files over 5 MB can't be uploaded here. Put them somewhere online (a GitHub folder works) and paste the link.</span>
+      <%= f.url_field :files_location, value: v[:files_location], placeholder: "https://github.com/you/project/tree/main/prints", class: "dash-input#{bad.(:files_location)}" %>
+      <%= err.(:files_location) %>
+    </label>
+    <%= err.(:files) %>
+  </section>
+
+  <section class="dash-card send-section">
+    <label class="dash-field">
+      <span class="control-label">anything else?</span>
+      <span class="dash-hint">Share anything you want to add! Tell us a joke :P</span>
+      <%= f.text_area :anything_else, value: v[:anything_else], rows: 3, maxlength: 2000, class: "dash-input dash-textarea" %>
+      <%= err.(:anything_else) %>
+    </label>
+  </section>
+
+  <div class="send-actions">
+    <%= f.submit "log this print", class: "cta cta-orange dash-save send-submit", disabled: @grants.none? { _1[:url] } %>
+  </div>
+<% end %>
