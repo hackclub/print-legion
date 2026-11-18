@@ -1369,11 +1369,15 @@ body[data-live="home"] .main {
 .send-recipient-miss {
     color: var(--red-100);
 }
-.send-in-person {
+.dash-toggle.send-in-person {
+    align-items: center; /* one line of text, so centre it on the switch */
     padding: 12px 14px;
     border-radius: 7px;
     background: var(--light-100);
     border: 1px solid var(--light-300);
+}
+.send-in-person .dash-toggle-track {
+    margin-top: 0;
 }
 .send-alt {
     padding: 14px;
