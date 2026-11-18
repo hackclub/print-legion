@@ -530,7 +530,7 @@
     sendForm();
 
     // One click, one save: grey the button out while the form is sent.
-    $$("form.dash-form, form.dash-hcb-form, form.send-form").forEach((form) => {
+    $$("form.dash-form, form.dash-hcb-form, form.send-form, form.dash-request-form").forEach((form) => {
       form.addEventListener("submit", () => {
         const btn = $("[type=submit]", form);
         if (!btn) return;

@@ -43,7 +43,16 @@ class DashboardController < ApplicationController
     if Eligibility.for(account, hca_id: session[:hca_id]).locked?
       return redirect_to dashboard_grants_path, alert: "You can't request a grant until your eligibility checks pass."
     end
-    ShippingGrantRequest.create!(account)
+    # A double click sends two requests at once; both would pass the pending
+    # check before either row exists. Only one gets through this lock.
+    lock = "grant-request-lock:#{account.id}"
+    raise ShippingGrantRequest::AlreadyPending unless Rails.cache.write(lock, true, unless_exist: true, expires_in: 30.seconds)
+    begin
+      ShippingGrantRequest.create!(account)
+    rescue AirtableClient::Error
+      Rails.cache.delete(lock) # nothing was made, so let them try again
+      raise
+    end
     redirect_to dashboard_grants_path, notice: "Shipping grant requested! The card will go to #{account.email || "your email"}."
   rescue ShippingGrantRequest::AlreadyPending
     redirect_to dashboard_grants_path, alert: "You already have a shipping grant request waiting."
