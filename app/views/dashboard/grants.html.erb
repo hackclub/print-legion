@@ -5,17 +5,6 @@
 <%= render "dashboard/header", title: "your grants", active: :grants %>
 
 <section class="dash-section dash-grants-page">
-  <%# Temporary: links out to the Fillout form until requests move into the dashboard. %>
-  <div class="dash-card dash-request">
-    <div>
-      <h2 class="dash-heading">need a shipping grant?</h2>
-      <p class="dash-text">Request one to cover the cost of sending out prints.</p>
-    </div>
-    <a class="cta cta-orange dash-cta" href="https://forms.hackclub.com/printing-legion-active-grants" target="_blank" rel="noopener">
-      <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>request a shipping grant
-    </a>
-  </div>
-
   <div class="dash-card dash-hcb">
     <div>
       <span class="control-label">email (and HCB email)</span>
@@ -33,9 +22,9 @@
 
   <% if @grants.nil? %>
     <p class="dash-empty">Couldn't load your grants right now. Try again in a minute.</p>
-  <% elsif @grants.empty? %>
-    <p class="dash-empty">No grants issued to you yet.</p>
   <% else %>
+    <% if @grants.empty? %><p class="dash-empty">No grants issued to you yet.</p><% end %>
+    <% if @grants.any? %>
     <% purposes = @grants.filter_map { _1[:purpose] }.tally.sort_by { |pu, n| [-n, pu.downcase] }.map(&:first) %>
     <div class="controls dash-controls">
       <div class="control">
@@ -52,6 +41,7 @@
         </div>
       </div>
     </div>
+    <% end %>
     <ol class="dash-grants" id="dash-grants">
       <% @grants.each do |g| %>
         <li class="dash-grant" data-purpose="<%= g[:purpose] %>">
@@ -63,6 +53,26 @@
           <% if g[:url] %><a class="pill pill-cyan" href="<%= g[:url] %>" target="_blank" rel="noopener">view card</a><% end %>
         </li>
       <% end %>
+      <%# Request a new card. Counts as a "Shipping Grant" for the purpose filter. %>
+      <li class="dash-grant dash-grant-request<%= " is-pending" if @pending_request %>" data-purpose="Shipping Grant">
+        <span class="dash-grant-info">
+          <span class="dash-grant-purpose">need a shipping grant?</span>
+          <span class="dash-print-meta">
+            <% if @pending_request %>
+              You asked<%= " on #{@pending_request[:created].strftime("%-d %b %Y")}" if @pending_request[:created] %>. Waiting to be sent.
+            <% else %>
+              Request a card to cover the cost of sending out prints. It goes to <%= @account.email || "your email" %>.
+            <% end %>
+          </span>
+        </span>
+        <% if @pending_request %>
+          <span class="cta cta-orange dash-cta is-disabled" aria-disabled="true"><%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>request pending</span>
+        <% else %>
+          <%= button_to dashboard_grant_request_path, method: :post, class: "cta cta-orange dash-cta", form_class: "dash-request-form", data: { request_grant: true } do %>
+            <%= image_tag "benchy.png", alt: "", class: "cta-icon cta-icon-cat" %>request a shipping grant
+          <% end %>
+        <% end %>
+      </li>
     </ol>
   <% end %>
 </section>

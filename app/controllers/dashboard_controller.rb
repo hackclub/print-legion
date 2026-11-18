@@ -3,7 +3,7 @@
 class DashboardController < ApplicationController
   before_action :require_printer!
   before_action { response.headers["Cache-Control"] = "no-store" }
-  rate_limit to: 10, within: 1.minute, only: %i[update_profile update_email],
+  rate_limit to: 10, within: 1.minute, only: %i[update_profile update_email request_shipping_grant],
              with: -> { redirect_to dashboard_path, alert: "Slow down a little, then try again." }
 
   rescue_from AirtableClient::Error, with: :airtable_down
@@ -34,6 +34,19 @@ class DashboardController < ApplicationController
       Rails.logger.warn("Grants: #{e.message}")
       nil
     end
+    @pending_request = ShippingGrantRequest.pending_for(@account) if @grants
+  end
+
+  # One click on the grants tab: a shipping grant request for this printer.
+  def request_shipping_grant
+    account = PrinterAccount.load(current_printer_id)
+    if Eligibility.for(account, hca_id: session[:hca_id]).locked?
+      return redirect_to dashboard_grants_path, alert: "You can't request a grant until your eligibility checks pass."
+    end
+    ShippingGrantRequest.create!(account)
+    redirect_to dashboard_grants_path, notice: "Shipping grant requested! The card will go to #{account.email || "your email"}."
+  rescue ShippingGrantRequest::AlreadyPending
+    redirect_to dashboard_grants_path, alert: "You already have a shipping grant request waiting."
   end
 
   def update_profile

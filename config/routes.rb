@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#show"
   get "dashboard/stats", to: "dashboard#stats", as: :dashboard_stats
   get "dashboard/grants", to: "dashboard#grants", as: :dashboard_grants
+  post "dashboard/grants/request", to: "dashboard#request_shipping_grant", as: :dashboard_grant_request
   get "dashboard/send", to: "sent_prints#new", as: :dashboard_send
   post "dashboard/send", to: "sent_prints#create"
   get "dashboard/send/recipient", to: "sent_prints#recipient", as: :dashboard_send_recipient

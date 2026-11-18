@@ -19,6 +19,7 @@ module AirtableConfig
     email: "fldXRE6VWYqFB0cjL", # also their HCB email; printers can change it
     total_prints: "fldYp5mgwaflSimaz",
     grants: "fldnHbwaOwsH6ChYh", # "Grants Issued" links
+    shipping_requests: "fldqkfJHmdzow6GqZ", # "Shipping Grants" links (requests)
     hackatime: "fld2Y5zNk4jPZyz3D", # hackatime_status: blue, green, red or blank
     # Formula names (formulas can't use field IDs).
     slack_id_name: "slack_id",
@@ -60,6 +61,17 @@ module AirtableConfig
     key: "fldzREGqpMZgDnJE6",
     data: "fldtpUkAzUw8lnurS",
     key_name: "Config" # for formulas
+  }.freeze
+
+  # "Shipping Grants": requests for a shipping grant card. Unticked "Sent?" =
+  # still pending.
+  SHIPPING_REQUESTS = {
+    table: "tblJP0vS1aJ7LmEKQ",
+    slack_id: "fldAboxrYANBsRHiu",
+    printer: "fldTs7vUZ6j3Fz3eH",
+    hcb_email: "fldpn0552spIWcb05",
+    sent: "fldOQte7b6s5dnlja",
+    created: "fldFVdy60x0LJcTck"
   }.freeze
 
   # "Grants Issued": one row per HCB grant card, linked to its printer.
