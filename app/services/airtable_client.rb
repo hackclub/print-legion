@@ -63,6 +63,22 @@ class AirtableClient
     request(:patch, "/v0/#{@base_id}/#{table}/#{record_id!(id)}", { fields:, returnFieldsByFieldId: true })
   end
 
+  # Creates one record (keys are field IDs). Returns it, fields keyed by ID.
+  def create(table, fields)
+    request(:post, "/v0/#{@base_id}/#{table}", { fields:, returnFieldsByFieldId: true })
+  end
+
+  # Deletes one record. Only used to roll back a record this app just created.
+  def destroy(table, id)
+    request(:delete, "/v0/#{@base_id}/#{table}/#{record_id!(id)}")
+  end
+
+  # Field definitions for a table (needs schema.bases:read on the token).
+  def table_schema(table)
+    request(:get, "/v0/meta/bases/#{@base_id}/tables").fetch("tables").find { _1["id"] == table } or
+      raise Error, "Airtable: no table #{table}"
+  end
+
   # Appends a file (max 5 MB) to an attachment field. Returns the record with
   # that field's attachments, keyed by field ID.
   def upload_attachment(id, field, content_type:, filename:, data:)
@@ -78,7 +94,7 @@ class AirtableClient
 
   private
 
-  VERBS = { get: Net::HTTP::Get, patch: Net::HTTP::Patch, post: Net::HTTP::Post }.freeze
+  VERBS = { get: Net::HTTP::Get, patch: Net::HTTP::Patch, post: Net::HTTP::Post, delete: Net::HTTP::Delete }.freeze
 
   def request(verb, path, body = nil, host: HOST, attempt: 0)
     req = VERBS.fetch(verb).new(path)

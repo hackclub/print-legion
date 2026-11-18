@@ -4,6 +4,7 @@
 # the life of the process, so the dashboard can be tried without a token.
 class FixtureAirtableClient
   EDITS = Hash.new { |h, k| h[k] = {} } # table => { record_id => fields }
+  CREATED = Hash.new { |h, k| h[k] = [] } # table => [records made in this process]
   LOCK = Mutex.new
 
   def list(table, fields:, formula: nil, sort: nil, page_size: 100, max_records: nil, offset: nil, all_pages: false, by_field_id: true)
@@ -38,11 +39,34 @@ class FixtureAirtableClient
 
   # Keeps the picture as a data URL so the page can show it straight away.
   def upload_attachment(id, field, content_type:, filename:, data:)
-    table = AirtableConfig::PRINTERS[:table]
+    table = [AirtableConfig::PRINTERS[:table], AirtableConfig::PRINTS[:table]].find { |t| load(t).any? { _1["id"] == id } } or
+      raise AirtableClient::Error, "Airtable 404: NOT_FOUND"
     url = "data:#{content_type};base64,#{Base64.strict_encode64(data)}"
     current = Array(find(table, id).dig("fields", field))
     att = { "id" => "att#{SecureRandom.alphanumeric(14)}", "url" => url, "filename" => filename, "type" => content_type }
     update(table, id, field => current + [att])
+  end
+
+  def create(table, fields)
+    id = "rec#{SecureRandom.alphanumeric(14)}"
+    rec = { "id" => id, "createdTime" => Time.now.utc.iso8601, "fields" => fields.transform_keys(&:to_s) }
+    LOCK.synchronize { CREATED[table] << rec }
+    rec
+  end
+
+  def destroy(table, id)
+    LOCK.synchronize { CREATED[table].reject! { _1["id"] == id } }
+    { "id" => id, "deleted" => true }
+  end
+
+  # Offline stand-in for the meta API: select choices are the values already
+  # used in the fixture records.
+  def table_schema(table)
+    fields = load(table).flat_map { _1["fields"].to_a }.group_by(&:first).map do |id, pairs|
+      names = pairs.map(&:last).select { _1.is_a?(String) }.uniq.sort
+      { "id" => id, "type" => "singleSelect", "options" => { "choices" => names.map { { "name" => _1 } } } }
+    end
+    { "id" => table, "fields" => fields }
   end
 
   def parallel(*jobs)
@@ -56,6 +80,7 @@ class FixtureAirtableClient
     path = Rails.root.join("db/fixtures/#{table}.json")
     records = path.exist? ? JSON.parse(File.read(path)) : []
     edits = LOCK.synchronize { EDITS[table].dup }
+    records += LOCK.synchronize { CREATED[table].dup }
     records.map { |r| edits[r["id"]] ? r.merge("fields" => r["fields"].merge(edits[r["id"]])) : r }
   end
 end

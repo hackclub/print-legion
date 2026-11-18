@@ -40,6 +40,14 @@ module AirtableConfig
     shipping_grant: "fldDKvrdYPtMlgOj9", # "HCB Grant (Shipping)" link
     message_url: "fldZgAuEky6xhRooi",
     recipient: "fldosutiMB5qJEQ5N", # slack_id_recipient
+    # Written by the dashboard's sent-print form (/dashboard/send):
+    slack_id: "fldl4GSgmo8GbCm1K",
+    github_url: "fldGcbheCzSIoFYI3",
+    recipient_grant: "fldRJ4kbiF6nIKSUK", # "HCB Grant (Recipient)"
+    shipping_proof: "fldSPmqbF0oS42YIu", # "Shipping Cost Proof"
+    stl_file: "fldyiozjritIyNqOY",
+    anything_else: "fld4ab8rGqcJ9UIo0",
+    files_location: "fldCwdYmh4gQ7IsXp", # "(ALT) Location of files", for files over 5 MB
     # Checkbox that hides a print from the site. Formulas need the name, not the ID.
     exclude_name: ENV["AIRTABLE_PRINT_EXCLUDE_FIELD"].presence || "Exclude on website"
   }.freeze
