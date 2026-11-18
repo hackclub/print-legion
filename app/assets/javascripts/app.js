@@ -446,6 +446,17 @@
     input.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(lookup, 350); });
     lookup();
 
+    // Delivered in person: no tracking, cost or receipt to give. Hidden fields
+    // are disabled so the browser doesn't require (or send) them.
+    const inPerson = $("[data-in-person]", form);
+    const shipOnly = $$("[data-ship-only]", form);
+    const syncInPerson = () => shipOnly.forEach((field) => {
+      field.hidden = inPerson.checked;
+      $$("input, select, textarea", field).forEach((el) => { el.disabled = inPerson.checked; });
+    });
+    inPerson.addEventListener("change", syncInPerson);
+    syncInPerson();
+
     // Files over 5 MB can't be uploaded: drop them from the picker and, for
     // photos and STLs, ask where they are instead.
     const alt = $("[data-alt-field]", form);

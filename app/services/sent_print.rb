@@ -23,18 +23,34 @@ class SentPrint
   GRANT_URL = %r{\Ahttps://hcb\.hackclub\.com/grants/[A-Za-z0-9]{4,}\z}
   ANY_URL = %r{\Ahttps://[^\s/]+\.[^\s/]+(/\S*)?\z}
 
-  FIELDS = %i[shipping_grant message_url recipient github_url recipient_grant tracking shipping_cost
+  FIELDS = %i[shipping_grant message_url recipient github_url recipient_grant in_person tracking shipping_cost
               country weight program files_location anything_else].freeze
+  IN_PERSON_TRACKING = "N/A, delivered in-person"
 
   attr_reader :values, :errors
 
   # Options a printer can pick from, read live from Airtable (10 min cache).
+  # YSWS are the ones listed under allowed_ysws in "[Config] Website Data" that
+  # also exist as options on the prints table (others can't be saved).
   def self.choices
-    Rails.cache.fetch("schema:prints:choices:v1", expires_in: 10.minutes) do
-      fields = AirtableClient.instance.table_schema(R[:table])["fields"]
+    Rails.cache.fetch("schema:prints:choices:v2", expires_in: 10.minutes) do
+      client = AirtableClient.instance
+      fields = client.table_schema(R[:table])["fields"]
       pick = ->(id) { Array(fields.find { _1["id"] == id }&.dig("options", "choices")).map { _1["name"] }.compact }
-      { countries: pick.(R[:sent_to_country]), programs: pick.(R[:program]) }
+      programs = pick.(R[:program])
+      allowed = allowed_ysws(client)
+      if (unknown = allowed - programs).any?
+        Rails.logger.warn("allowed_ysws lists YSWS with no matching option on prints: #{unknown.join(", ")}")
+      end
+      { countries: pick.(R[:sent_to_country]), programs: allowed & programs }
     end
+  end
+
+  def self.allowed_ysws(client)
+    c = AirtableConfig::WEBSITE_CONFIG
+    rows, = client.list(c[:table], fields: [c[:key], c[:data]], formula: %({#{c[:key_name]}}='allowed_ysws'), page_size: 5)
+    row = rows.find { _1.dig("fields", c[:key]).to_s.strip == "allowed_ysws" }
+    row.to_h.dig("fields", c[:data]).to_s.split(/[,\n]/).map(&:strip).reject(&:empty?).uniq
   end
 
   def initialize(account:, grants:, params: {}, files: {})
@@ -45,10 +61,17 @@ class SentPrint
     @errors = {}
   end
 
+  def in_person? = @values[:in_person] == "1"
+
   def valid?
     @errors = {}
     v = @values
     choices = self.class.choices
+    if in_person? # nothing was posted: no tracking, no cost, no receipt
+      v[:tracking] = IN_PERSON_TRACKING
+      v[:shipping_cost] = "0"
+      @files[:proof] = []
+    end
 
     need(:shipping_grant, @grant_urls.include?(v[:shipping_grant]), "Pick one of your grant cards.")
     need(:message_url, v[:message_url].match?(MESSAGE_URL), "Paste the link to your message in #printing-legion.")
@@ -66,7 +89,7 @@ class SentPrint
       need(:files_location, v[:files_location].length <= 500 && v[:files_location].match?(ANY_URL), "Paste a full https:// link.")
     end
 
-    check_files(:proof, PROOF_TYPES, required: true, alt_ok: false, label: "shipping proof")
+    check_files(:proof, PROOF_TYPES, required: !in_person?, alt_ok: false, label: "shipping proof")
     check_files(:images, IMAGE_TYPES, required: true, alt_ok: true, label: "print photo")
     check_files(:stls, MODEL_TYPES, required: true, alt_ok: true, label: "STL file")
     total = @files.values.flatten.sum(&:size)

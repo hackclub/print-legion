@@ -52,6 +52,16 @@ module AirtableConfig
     exclude_name: ENV["AIRTABLE_PRINT_EXCLUDE_FIELD"].presence || "Exclude on website"
   }.freeze
 
+  # "[Config] Website Data": settings staff edit in Airtable, one per row
+  # (Config = name, Data = value). allowed_ysws is a comma-separated list of
+  # the YSWS the sent-print form offers.
+  WEBSITE_CONFIG = {
+    table: "tblZQoFiPXseI8daB",
+    key: "fldzREGqpMZgDnJE6",
+    data: "fldtpUkAzUw8lnurS",
+    key_name: "Config" # for formulas
+  }.freeze
+
   # "Grants Issued": one row per HCB grant card, linked to its printer.
   GRANTS = {
     table: "tbl6ygoiDkgC7Zln5",

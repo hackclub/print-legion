@@ -16,7 +16,7 @@
     <li>printed all the parts requested</li>
     <li>shipped it out to the recipient</li>
   </ul>
-  <p><b>One form per request, not several at once. Don't fill it out until the print is shipped.</b></p>
+  <p><b>Fill this out once for each project. Don't fill it out until the print is shipped.</b></p>
 </div>
 
 <%= form_with url: dashboard_send_path, method: :post, scope: :print, multipart: true, class: "send-form", data: { send_form: true } do |f| %>
@@ -33,7 +33,7 @@
 
     <label class="dash-field">
       <span class="control-label">HCB shipping card</span>
-      <span class="dash-hint">The card you paid for the label with. Haven't paid for the label yet? Fill this out after you do.</span>
+      <span class="dash-hint">This is the card you bought the label with. If you haven't bought a label yet, don't fill this form!</span>
       <% if @grants.any? { _1[:url] } %>
         <%= f.select :shipping_grant,
               @grants.select { _1[:url] }.map { |g| ["#{g[:purpose] || "grant card"}#{g[:amount] ? " · #{number_to_currency(g[:amount], precision: (g[:amount] % 1).zero? ? 0 : 2)}" : ""} · #{link_label.(g[:url])}", g[:url]] },
@@ -82,20 +82,29 @@
   <section class="dash-card send-section">
     <h2 class="dash-heading">shipping details</h2>
 
-    <label class="dash-field">
+    <label class="dash-toggle send-in-person">
+      <%= f.check_box :in_person, { checked: v[:in_person] == "1", class: "dash-toggle-input", role: "switch", data: { in_person: true } }, "1", "0" %>
+      <span class="dash-toggle-track" aria-hidden="true"></span>
+      <span class="dash-toggle-text">
+        <b>delivered in person</b>
+        <span class="dash-hint">No post involved: we'll fill in the tracking as "<%= SentPrint::IN_PERSON_TRACKING %>" and the shipping cost as $0.</span>
+      </span>
+    </label>
+
+    <label class="dash-field" data-ship-only>
       <span class="control-label">tracking number</span>
-      <span class="dash-hint">Only the tracking number(s), no links. Several shipments: separate them with commas. Met in person? Write "N/A, delivered in-person".</span>
+      <span class="dash-hint">Only tracking numbers, no URLs.</span>
       <%= f.text_field :tracking, value: v[:tracking], required: true, maxlength: 200, placeholder: "SHIP0001, SHIP0002", class: "dash-input#{bad.(:tracking)}" %>
       <%= err.(:tracking) %>
     </label>
 
-    <label class="dash-field">
+    <label class="dash-field" data-ship-only>
       <span class="control-label">shipping cost (USD)</span>
       <%= f.text_field :shipping_cost, value: v[:shipping_cost], required: true, inputmode: "decimal", pattern: "\\d{1,4}(\\.\\d{1,2})?", placeholder: "0.67", class: "dash-input send-short#{bad.(:shipping_cost)}" %>
       <%= err.(:shipping_cost) %>
     </label>
 
-    <label class="dash-field">
+    <label class="dash-field" data-ship-only>
       <span class="control-label">shipping cost proof</span>
       <span class="dash-hint">A receipt or confirmation showing the exact price of the label. PNG, JPG or PDF, up to 5 MB.</span>
       <%= f.file_field :proof, multiple: true, required: true, accept: SentPrint::PROOF_TYPES.keys.map { ".#{_1}" }.join(","), class: "send-file#{bad.(:proof)}", data: { max_bytes: SentPrint::MAX_FILE, kind: "proof" } %>
@@ -120,8 +129,8 @@
 
     <label class="dash-field">
       <span class="control-label">which YSWS is this print for?</span>
-      <span class="dash-hint">Shipping parts for more than one program? Fill this out separately for each.</span>
       <%= f.select :program, @choices[:programs], { include_blank: "pick a YSWS…", selected: v[:program] }, { required: true, class: "dash-input send-select#{bad.(:program)}" } %>
+      <% if @choices[:programs].empty? %><p class="send-error">No YSWS are open for prints right now. Ask in #printing-legion.</p><% end %>
       <%= err.(:program) %>
     </label>
 

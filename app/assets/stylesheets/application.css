@@ -1369,6 +1369,12 @@ body[data-live="home"] .main {
 .send-recipient-miss {
     color: var(--red-100);
 }
+.send-in-person {
+    padding: 12px 14px;
+    border-radius: 7px;
+    background: var(--light-100);
+    border: 1px solid var(--light-300);
+}
 .send-alt {
     padding: 14px;
     border-radius: 7px;
